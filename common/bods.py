@@ -5,16 +5,15 @@ from typing import Any, Dict
 
 import orjson
 from zavod import Zavod
+from zavod.audit import audit_data
 
-UNUSED_KEYS = set(
-    (
-        "isComponent",
-        "type",
-        "entityType",
-        "replacesStatements",
-        "statementDate",
-    )
-)
+AUDIT_IGNORE = [
+    "isComponent",
+    "type",
+    "entityType",
+    "replacesStatements",
+    "statementDate",
+]
 
 SCHEME_PROPS = {
     "Not a valid Org-Id scheme, provided for backwards compatibility": "registrationNumber",
@@ -80,7 +79,7 @@ def parse_statement(context: Zavod, data: Dict[str, Any]) -> None:
             countries.add(nat.pop("code"))
             proxy.add("nationality", nat.pop("name"))
 
-        for country in data.pop("taxResidencies", []):  # FIXME?
+        for country in data.pop("taxResidencies", []):
             countries.add(country.pop("code"))
 
         addr = data.pop("placeOfResidence", None)
@@ -96,7 +95,7 @@ def parse_statement(context: Zavod, data: Dict[str, Any]) -> None:
         proxy = context.make("LegalEntity")
         proxy.add("name", data.pop("name", None))
 
-        proxy.add("name", data.pop("alternateNames", []))  # FIXME?
+        proxy.add("alias", data.pop("alternateNames", []))
         proxy.add("incorporationDate", data.pop("foundingDate", None))
         proxy.add("dissolutionDate", data.pop("dissolutionDate", None))
 
@@ -158,12 +157,11 @@ def parse_statement(context: Zavod, data: Dict[str, Any]) -> None:
     proxy.add("publisher", publisher.pop("name", None))
     proxy.add("publisherUrl", publisher.pop("url", None))
 
-    # add all the countries  FIXME
+    # add all the countries
     if statement_type in ("personStatement", "entityStatement"):
         proxy.add("country", countries)
 
-    if set(data.keys()) - UNUSED_KEYS:
-        pprint({"type": statement_type, "data": data})
+    audit_data(data, AUDIT_IGNORE)
 
     context.emit(proxy)
 
