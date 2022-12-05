@@ -1,16 +1,18 @@
 import csv
 import json
-from lxml import html
-from pprint import pprint
-from zipfile import ZipFile
+from concurrent.futures import ThreadPoolExecutor, wait
+from datetime import datetime
 from functools import cache
 from io import TextIOWrapper
-from datetime import datetime
+from pprint import pprint
 from urllib.parse import urljoin
-from concurrent.futures import ThreadPoolExecutor, wait
+from zipfile import ZipFile
 
-from zavod import PathLike, init_context, Zavod
+from lxml import html
+from zavod import PathLike, Zavod, init_context
 from zavod.parse import make_address
+
+from common.util import make_oc_company_id
 
 BASE_URL = "http://download.companieshouse.gov.uk/en_output.html"
 PSC_URL = "http://download.companieshouse.gov.uk/en_pscdata.html"
@@ -23,11 +25,6 @@ KINDS = {
     "persons-with-significant-control-statement": "",
     "exemptions": "",
 }
-
-
-def company_id(context: Zavod, company_nr):
-    nr = company_nr.lower()
-    return f"oc-companies-gb-{nr}"
 
 
 @cache
@@ -73,7 +70,7 @@ def parse_base_data(context: Zavod):
             context.log.info("Companies: %d..." % idx)
         company_nr = row.pop("CompanyNumber")
         entity = context.make("Company")
-        entity.id = company_id(context, company_nr)
+        entity.id = make_oc_company_id(context, "gb", company_nr)
         entity.add("name", row.pop("CompanyName"))
         entity.add("registrationNumber", company_nr)
         entity.add("status", row.pop("CompanyStatus"))
@@ -215,7 +212,10 @@ def parse_psc_data(context: Zavod):
         link = context.make("Ownership")
         link.id = context.make_slug("stmt", company_nr, psc_id)
         link.add("owner", psc.id)
-        link.add("asset", company_id(context, company_nr))
+        link.add(
+            "asset",
+            make_oc_company_id(context, "gb", company_nr),
+        )
         link.add("modifiedAt", data.pop("notified_on"))
         link.add("endDate", data.pop("ceased_on", None))
 

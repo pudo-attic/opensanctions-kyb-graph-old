@@ -7,6 +7,8 @@ import orjson
 from zavod import Zavod
 from zavod.audit import audit_data
 
+from .util import make_oc_company_id
+
 AUDIT_IGNORE = [
     "isComponent",
     "type",
@@ -157,9 +159,13 @@ def parse_statement(context: Zavod, data: Dict[str, Any]) -> None:
     proxy.add("publisher", publisher.pop("name", None))
     proxy.add("publisherUrl", publisher.pop("url", None))
 
-    # add all the countries
+    # LegalEntity specific adjustments
     if statement_type in ("personStatement", "entityStatement"):
         proxy.add("country", countries)
+        if proxy.has("opencorporatesUrl"):
+            oc_url = proxy.first("opencorporatesUrl")
+            country, company_nr = oc_url.split("/")[:-2]
+            proxy.id = make_oc_company_id(context, country, company_nr)
 
     audit_data(data, AUDIT_IGNORE)
 
