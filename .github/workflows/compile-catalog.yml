@@ -1,4 +1,4 @@
-name: process-gleif
+name: compile-catalog
 
 on:
   schedule:
