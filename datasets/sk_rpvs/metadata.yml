@@ -1,0 +1,8 @@
+name: sk_rpvs
+title: Slovakia Public Sector Partners Register (Register partnerov verejného sektora - RPVS)
+prefix: oo
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/contrib/sk_rpvs/entities.ftm.json
+    mime_type: application/json+ftm
+

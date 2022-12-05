@@ -1,0 +1,8 @@
+name: uk_coh_psc
+title: UK Persons with significant control (PSC) Register
+prefix: oo
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/contrib/uk_coh_psc/entities.ftm.json
+    mime_type: application/json+ftm
+
