@@ -1,4 +1,4 @@
-name: process-cy-companies
+name: process-cy_companies
 
 on:
   schedule:
