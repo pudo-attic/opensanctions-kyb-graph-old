@@ -1,3 +1,4 @@
+all: clean process publish
 
 data/full-oldb.zip:
 	mkdir -p data/

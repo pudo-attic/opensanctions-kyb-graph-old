@@ -1,6 +1,6 @@
+all: clean process publish
 
-
-data/fragments.json:
+data/fragments.json: parse.py
 	python parse.py
 
 data/sorted.json: data/fragments.json
@@ -14,3 +14,6 @@ publish:
 	aws s3 sync --no-progress --cache-control "public, max-age=64600" --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/contrib/cy_companies
 
 process: data/export/entities.ftm.json
+
+clean:
+	rm -rf data/
