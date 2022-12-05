@@ -1,14 +1,13 @@
 import csv
-from io import TextIOWrapper
 import requests
 from pathlib import Path
 from zipfile import ZipFile
 from lxml import etree, html
+from io import TextIOWrapper
 from normality import slugify
 from urllib.parse import urljoin
 from contextlib import contextmanager
 from typing import BinaryIO, Dict, List, Optional, Tuple
-from followthemoney import model
 from zavod import Zavod, init_context
 from zavod.parse import remove_namespace
 
@@ -155,7 +154,7 @@ def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
         if idx > 0 and idx % 10000 == 0:
             context.log.info("Parse LEIRecord: %d..." % idx)
         elc = remove_namespace(el)
-        proxy = model.make_entity("Company")
+        proxy = context.make("Company")
         lei = elc.findtext("LEI")
         if lei is None:
             continue
@@ -177,7 +176,7 @@ def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
         proxy.add("leiCode", lei, quiet=True)
 
         for isin in isins.get(lei, []):
-            security = model.make_entity("Security")
+            security = context.make("Security")
             security.id = f"lei-isin-{isin}"
             security.add("isin", isin)
             security.add("issuer", proxy.id)
@@ -200,7 +199,7 @@ def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
         successor = elc.find("SuccessorEntity")
         if successor is not None:
             succ_lei = successor.findtext("SuccessorLEI")
-            succession = model.make_entity("Succession")
+            succession = context.make("Succession")
             succession.id = f"lei-succession-{lei}-{succ_lei}"
             succession.add("predecessor", lei)
             succession.add("successor", lei_id(succ_lei))
@@ -243,7 +242,7 @@ def parse_rr_file(context: Zavod, fh: BinaryIO):
             continue
         end_lei = end_node.findtext("NodeID")
 
-        proxy = model.make_entity(rel_schema)
+        proxy = context.make(rel_schema)
         rel_id = slugify(rel_type, sep="-")
         proxy.id = f"lei-{start_lei}-{rel_id}-{end_lei}"
         proxy.add(start_prop, lei_id(start_lei))
