@@ -8,7 +8,7 @@ on:
 jobs:
   data:
     runs-on: ubuntu-latest
-    container: ghcr.io/opensanctions/graph-etl
+    container: ghcr.io/opensanctions/graph-etl:main
     defaults:
       run:
         working-directory: /graph/datasets/gleif
