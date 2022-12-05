@@ -13,7 +13,7 @@ jobs:
       run:
         working-directory: /graph/datasets/icij_offshoreleaks
     steps:
-      - name: Parse and write the DK CVR data
+      - name: Parse and write the ICIJ data
         run: |
           make process
       - name: Publish data to data.opensanctions.org
@@ -22,6 +22,3 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           make publish
-
-
-
