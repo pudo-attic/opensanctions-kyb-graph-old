@@ -1,0 +1,3 @@
+.mypy_cache
+datasets/*/data
+.github
