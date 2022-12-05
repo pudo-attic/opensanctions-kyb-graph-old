@@ -123,7 +123,7 @@ def read_rows(context, zip_path, file_name):
 def make_row_entity(context: Zavod, row, schema):
     # node_id = row.pop("id", row.pop("_id", row.pop("node_id", None)))
     node_id = row.pop("node_id", None)
-    proxy = model.make_entity(schema)
+    proxy = context.make(schema)
     proxy.id = make_entity_id(node_id)
     if proxy.id is None:
         context.log.error("No ID: %r", row)
@@ -191,7 +191,7 @@ def make_row_entity(context: Zavod, row, schema):
 
 def make_row_address(context: Zavod, row):
     node_id = row.pop("node_id", None)
-    proxy = model.make_entity("Address")
+    proxy = context.make("Address")
     proxy.id = make_entity_id(node_id)
     proxy.add("full", row.pop("address", None))
 
@@ -249,7 +249,7 @@ def make_row_relationship(context: Zavod, row):
         return
 
     if res.schema is not None:
-        rel = model.make_entity(res.schema)
+        rel = context.make(res.schema)
         rel_id = slugify(f"{_start}-{_end}-{link}")
         rel.id = make_entity_id(rel_id)
         rel.add("startDate", start_date)
@@ -263,11 +263,11 @@ def make_row_relationship(context: Zavod, row):
         context.emit(rel)
 
         # this turns legalentity into organization in some cases
-        start_ent = model.make_entity(rel.schema.get(res.start).range)
+        start_ent = context.make(rel.schema.get(res.start).range)
         start_ent.id = start
         emit_entity(start_ent)
 
-        end_ent = model.make_entity(rel.schema.get(res.end).range)
+        end_ent = context.make(rel.schema.get(res.end).range)
         end_ent.id = end
         emit_entity(end_ent)
 
