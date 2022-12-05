@@ -1,0 +1,7 @@
+name: cy_companies
+title: Cyprus company registry
+prefix: cy
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/contrib/cy_companies/entities.ftm.json
+    mime_type: application/json+ftm

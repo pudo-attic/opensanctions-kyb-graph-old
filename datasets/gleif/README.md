@@ -2,10 +2,6 @@
 
 This script will convert the concatenated data files from the Global Legal Entity Identifier Foundation (GLEIF) into the `followthemoney` format. GLEIF publishes a set of files that describe all companies which have been issued an LEI, and some ownership relationships between them.
 
-The finished data is uploaded to S3 and available from:
-
-* https://data.opensanctions.org/contrib/gleif/gleif.json
-
 ### Links
 
 * [GLEIF Concatenated Downloads](https://www.gleif.org/en/lei-data/gleif-concatenated-file/download-the-concatenated-file#)

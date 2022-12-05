@@ -1,5 +1,5 @@
 name: gleif
-title: GLEIF Concatenated Data
+title: GLEIF Concatenated Data File
 prefix: lei
 resources:
   - name: entities.ftm.json
