@@ -1,3 +1,4 @@
+all: clean process
 
 
 data/fragments.json:
@@ -14,3 +15,6 @@ publish:
 	aws s3 sync --no-progress --cache-control "public, max-age=64600" --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/contrib/gleif
 
 process: data/export/entities.ftm.json
+
+clean:
+	rm -rf data
