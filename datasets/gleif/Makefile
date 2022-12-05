@@ -8,6 +8,9 @@ data/sorted.json: data/fragments.json
 
 data/export/data.json: data/sorted.json
 	mkdir -p data/export
-	ftm sorted-aggregate -i data/sorted.json -o data/export/data.json
+	ftm sorted-aggregate -i data/sorted.json -o data/export/entities.ftm.json
 
-build: data/export/data.json
+publish:
+	aws s3 sync --no-progress --cache-control "public, max-age=64600" --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/contrib/gleif
+
+process: data/export/entities.ftm.json

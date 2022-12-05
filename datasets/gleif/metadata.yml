@@ -1,3 +1,7 @@
 name: gleif
 title: GLEIF Concatenated Data
 prefix: lei
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/contrib/gleif/entities.ftm.json
+    mime_type: application/json+ftm
