@@ -1,5 +1,5 @@
-name: uk_coh_psc
-title: UK Persons with significant control (PSC) Register
+name: gb_coh_psc_bods
+title: UK Persons with significant control (PSC) Register (from OpenOwnership BODS)
 prefix: oo
 resources:
   - name: entities.ftm.json
