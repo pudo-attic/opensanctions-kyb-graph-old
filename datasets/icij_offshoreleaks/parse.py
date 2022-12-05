@@ -1,7 +1,6 @@
 import io
 import yaml
 import click
-import logging
 from typing import Dict
 from csv import DictReader
 from functools import cache, lru_cache
@@ -231,7 +230,7 @@ def make_row_relationship(context: Zavod, row):
     try:
         res = lookup("relationships", link)
     except Exception as exc:
-        print((exc.message, exc.value))
+        context.log.exception("Unknown link: %s" % link)
         return
 
     if res is None:

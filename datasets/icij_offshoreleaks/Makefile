@@ -3,7 +3,7 @@ data/full-oldb.zip:
 	mkdir -p data/
 	wget -q -c -O data/full-oldb.zip https://offshoreleaks-data.icij.org/offshoreleaks/csv/full-oldb.20220708.zip
 
-data/fragments.json: data/full-oldb.zip
+data/fragments.json: data/full-oldb.zip parse.py
 	python parse.py data/full-oldb.zip
 
 data/sorted.json: data/fragments.json
