@@ -8,7 +8,7 @@ data/combined.json: data/fragments.json
           
 data/export/entities.ftm.json: data/combined.json
 	mkdir -p data/export
-	ftm sorted-aggregate -o data/export/psc.json -i data/combined.json
+	nk sorted-aggregate -o data/export/psc.json -i data/combined.json
 
 publish:
 	aws s3 sync --no-progress --cache-control "public, max-age=64600" --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/contrib/icij_offshoreleaks
