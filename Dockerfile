@@ -12,8 +12,7 @@ RUN apt-get -qq -y update \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 ENV LANG="en_US.UTF-8"
-RUN ln -s /usr/bin/python3 /usr/bin/python && \
-    ln -s /usr/bin/pip3 /usr/bin/pip
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN mkdir -p /graph
 COPY . /graph
