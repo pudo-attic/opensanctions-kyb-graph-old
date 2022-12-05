@@ -1,2 +1,7 @@
 https://data.opensanctions.org/contrib/gleif/index.json
 https://data.opensanctions.org/contrib/ua_edr/index.json
+https://data.opensanctions.org/contrib/icij_offshoreleaks/index.json
+https://data.opensanctions.org/contrib/cy_companies/index.json
+https://data.opensanctions.org/contrib/dk_cvr/index.json
+https://data.opensanctions.org/contrib/gb_coh_psc/index.json
+https://data.opensanctions.org/contrib/sk_rpvs/index.json
