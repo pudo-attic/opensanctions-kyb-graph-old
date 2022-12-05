@@ -1,0 +1,9 @@
+name: ua_edr
+title: Ukraine Consolidated State Registry (Edinyy Derzhavnyj Reestr)
+prefix: ua-edr
+coverage:
+  end: 2022-02-23
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/contrib/ua_edr/entities.ftm.json
+    mime_type: application/json+ftm
