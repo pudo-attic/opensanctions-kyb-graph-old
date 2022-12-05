@@ -164,7 +164,7 @@ def parse_statement(context: Zavod, data: Dict[str, Any]) -> None:
         proxy.add("country", countries)
         if proxy.has("opencorporatesUrl"):
             oc_url = proxy.first("opencorporatesUrl")
-            country, company_nr = oc_url.split("/")[:-2]
+            country, company_nr = oc_url.split("/")[-2:]
             proxy.id = make_oc_company_id(context, country, company_nr)
 
     audit_data(data, AUDIT_IGNORE)
