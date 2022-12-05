@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 datasets/*/data
 .DS_Store
+catalog.json
 
 # C extensions
 *.so

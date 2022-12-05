@@ -1,0 +1,2 @@
+https://data.opensanctions.org/contrib/gleif/index.json
+https://data.opensanctions.org/contrib/ua_edr/index.json
