@@ -10,7 +10,8 @@ def build_catalog(catalog_in: PathLike):
     catalog = DataCatalog(ZavodDataset, {})
     catalog.updated_at = datetime_iso(datetime.utcnow())
     with open(catalog_in, "r") as fh:
-        while url := fh.readline():
+        while line := fh.readline():
+            url = line.strip()
             try:
                 resp = requests.get(url)
                 data = resp.json()
