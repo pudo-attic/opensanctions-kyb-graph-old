@@ -6,19 +6,29 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Maximize build space
+        run: |
+          echo "$AGENT_TOOLSDIRECTORY"
   data:
     runs-on: ubuntu-latest
-    container: ghcr.io/opensanctions/graph-etl:main
+    needs: [cleanup]
+    container:
+      image: ghcr.io/opensanctions/graph-etl:main
+      volumes:
+        - /:/host
     defaults:
       run:
         working-directory: /graph/datasets/gb_coh_psc
     steps:
       - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 512
-          swap-size-mb: 1024
-          remove-dotnet: "true"
+        run: |
+          rm -rf /host/usr/share/dotnet
+          rm -rf /host/opt/ghc
+          rm -rf "/host/usr/local/share/boost"
+        # rm -rf "/host/$AGENT_TOOLSDIRECTORY"
       - name: Parse and write the GB CoH PSC data
         run: |
           make process
