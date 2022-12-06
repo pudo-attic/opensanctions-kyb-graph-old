@@ -3,6 +3,5 @@ title: Denmark Central Business Register (Centrale Virksomhedsregister - CVR)
 prefix: oo
 resources:
   - name: entities.ftm.json
-    url: https://data.opensanctions.org/contrib/dk_zvr/entities.ftm.json
+    url: https://data.opensanctions.org/contrib/dk_cvr/entities.ftm.json
     mime_type: application/json+ftm
-
