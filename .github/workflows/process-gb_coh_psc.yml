@@ -18,9 +18,10 @@ jobs:
     steps:
       - name: Maximize build space
         run: |
-          rm -rf /host/usr/share/dotnet
           rm -rf /host/opt/ghc
+          rm -rf /host/usr/share/dotnet
           rm -rf "/host/usr/local/share/boost"
+          rm -rf "/host/usr/local/lib/android"
           rm -rf "/host/opt/hostedtoolcache"
           ls /host/opt
       - name: Parse and write the GB CoH PSC data
