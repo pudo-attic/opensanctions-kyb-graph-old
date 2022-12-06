@@ -13,6 +13,12 @@ jobs:
       run:
         working-directory: /graph/datasets/gb_coh_psc
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: "true"
       - name: Parse and write the GB CoH PSC data
         run: |
           make process
@@ -22,6 +28,3 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           make publish
-
-
-
