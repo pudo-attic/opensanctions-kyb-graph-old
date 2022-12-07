@@ -302,6 +302,7 @@ def make_db(zip_file):
         for row in read_rows(context, zip_file, "relationships.csv"):
             make_row_relationship(context, row)
 
+        context.export_metadata("export/index.json")
         dump_nodes(context)
 
 
