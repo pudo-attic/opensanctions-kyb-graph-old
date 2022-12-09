@@ -367,7 +367,7 @@ def crawl_parallel(context: Zavod):
 
 
 if __name__ == "__main__":
-    with init_context("metdata.yml") as context:
+    with init_context("metadata.yml") as context:
         context.export_metadata("export/index.json")
         crawl_parallel(context)
         # crawl(context)
