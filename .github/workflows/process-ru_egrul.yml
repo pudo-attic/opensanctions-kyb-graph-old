@@ -27,18 +27,18 @@ jobs:
           rm -rf "/host/opt/mssql-tools"
           rm -rf "/host/opt/vsts"
           rm -rf "/host/opt/az"
-          echo "Contents of /opt:"
-          ls /host/opt
-          echo "Contents of /home:"
-          du -hs /host/home/*
-          echo "Contents of /var:"
-          du -hs /host/var/*
-          echo "Contents of /usr:"
-          du -hs /host/usr/*
-          echo "Contents of /usr/local:"
-          du -hs /host/usr/local/*
           echo "Overall usage:"
           df -h
+        # echo "Contents of /opt:"
+        # ls /host/opt
+        # echo "Contents of /home:"
+        # du -hs /host/home/*
+        # echo "Contents of /var:"
+        # du -hs /host/var/*
+        # echo "Contents of /usr:"
+        # du -hs /host/usr/*
+        # echo "Contents of /usr/local:"
+        # du -hs /host/usr/local/*
       - name: Parse and write the EGRUL data
         run: |
           make process
