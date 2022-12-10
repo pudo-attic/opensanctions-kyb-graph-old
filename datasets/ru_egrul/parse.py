@@ -345,15 +345,17 @@ def crawl_index(context: Zavod, url: str) -> Set[str]:
 def crawl_archive(context: Zavod, url: str):
     url_path = urlparse(url).path.lstrip("/")
     path = context.fetch_resource(url_path, url)
-    context.log.info("Parsing: %s" % url_path)
-    with ZipFile(path, "r") as zip:
-        for name in zip.namelist():
-            if not name.lower().endswith(".xml"):
-                continue
-            with zip.open(name, "r") as fh:
-                parse_xml(context, fh)
+    try:
+        context.log.info("Parsing: %s" % url_path)
+        with ZipFile(path, "r") as zip:
+            for name in zip.namelist():
+                if not name.lower().endswith(".xml"):
+                    continue
+                with zip.open(name, "r") as fh:
+                    parse_xml(context, fh)
 
-    path.unlink(missing_ok=True)
+    finally:
+        path.unlink(missing_ok=True)
 
 
 def crawl(context: Zavod):

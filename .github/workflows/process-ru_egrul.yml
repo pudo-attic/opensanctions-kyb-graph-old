@@ -29,10 +29,7 @@ jobs:
           rm -rf "/host/opt/az"
           echo "Contents of /opt:"
           ls /host/opt
-          echo "Contents of /mnt:"
-          du -hs /host/mnt/*
           echo "Contents of /home:"
-          du -hs /host/home/github/*
           du -hs /host/home/*
           echo "Contents of /var:"
           du -hs /host/var/*
