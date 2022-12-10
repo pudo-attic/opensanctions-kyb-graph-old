@@ -29,8 +29,17 @@ jobs:
           rm -rf "/host/opt/az"
           echo "Contents of /opt:"
           ls /host/opt
-          echo "Folder sizes:"
-          du -hs /host/*
+          echo "Contents of /mnt:"
+          du -hs /host/mnt/*
+          echo "Contents of /home:"
+          du -hs /host/home/github/*
+          du -hs /host/home/*
+          echo "Contents of /var:"
+          du -hs /host/var/*
+          echo "Contents of /usr:"
+          du -hs /host/usr/*
+          echo "Contents of /usr/local:"
+          du -hs /host/usr/local/*
           echo "Overall usage:"
           df -h
       - name: Parse and write the EGRUL data
