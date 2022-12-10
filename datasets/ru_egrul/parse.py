@@ -353,6 +353,8 @@ def crawl_archive(context: Zavod, url: str):
             with zip.open(name, "r") as fh:
                 parse_xml(context, fh)
 
+    path.unlink(missing_ok=True)
+
 
 def crawl(context: Zavod):
     # TODO: thread pool execution
