@@ -23,7 +23,16 @@ jobs:
           rm -rf "/host/usr/local/share/boost"
           rm -rf "/host/usr/local/lib/android"
           rm -rf "/host/opt/hostedtoolcache"
+          rm -rf "/host/opt/google"
+          rm -rf "/host/opt/mssql-tools"
+          rm -rf "/host/opt/vsts"
+          rm -rf "/host/opt/az"
+          echo "Contents of /opt:"
           ls /host/opt
+          echo "Folder sizes:"
+          du -hs /host/*
+          echo "Overall usage:"
+          df -h
       - name: Parse and write the EGRUL data
         run: |
           make process
