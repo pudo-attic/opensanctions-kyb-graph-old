@@ -2,7 +2,7 @@ all: clean fetch process publish
 
 data/export/entities.ftm.json: data/sorted.json
 	mkdir -p data/export
-	ftm sorted-aggregate -i data/sorted.json -o data/export/entities.ftm.json
+	nk sorted-aggregate -i data/sorted.json -o data/export/entities.ftm.json
 
 data/sorted.json: data/fragments.json
 	sort -o data/sorted.json data/fragments.json
