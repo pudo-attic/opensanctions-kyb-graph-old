@@ -155,4 +155,4 @@ def crawl(context: Zavod, url: str):
 if __name__ == "__main__":
     with init_context("metadata.yml") as context:
         context.export_metadata("export/index.json")
-        crawl(context, "https://data.opensanctions.org/graph/ua_edr/23022022.zip")
+        crawl(context, "https://data.opensanctions.org/contrib/ua_edr/23022022.zip")
