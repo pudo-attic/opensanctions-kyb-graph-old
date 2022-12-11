@@ -28,5 +28,5 @@ coverage:
   end: 2022-01-01
 resources:
   - name: entities.ftm.json
-    url: https://data.opensanctions.org/contrib/ru_egrul/entities.ftm.json
+    url: https://data.opensanctions.org/graph/ru_egrul/entities.ftm.json
     mime_type: application/json+ftm

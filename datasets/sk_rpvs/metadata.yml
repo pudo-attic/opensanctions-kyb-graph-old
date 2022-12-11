@@ -3,6 +3,5 @@ title: Slovakia Public Sector Partners Register (Register partnerov verejného s
 prefix: oo
 resources:
   - name: entities.ftm.json
-    url: https://data.opensanctions.org/contrib/sk_rpvs/entities.ftm.json
+    url: https://data.opensanctions.org/graph/sk_rpvs/entities.ftm.json
     mime_type: application/json+ftm
-

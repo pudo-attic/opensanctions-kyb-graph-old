@@ -1,8 +1,8 @@
-https://data.opensanctions.org/contrib/gleif/index.json
-https://data.opensanctions.org/contrib/ua_edr/index.json
-https://data.opensanctions.org/contrib/icij_offshoreleaks/index.json
-https://data.opensanctions.org/contrib/cy_companies/index.json
-https://data.opensanctions.org/contrib/dk_cvr/index.json
-https://data.opensanctions.org/contrib/gb_coh_psc/index.json
-https://data.opensanctions.org/contrib/sk_rpvs/index.json
-https://data.opensanctions.org/contrib/ru_egrul/index.json
+https://data.opensanctions.org/graph/gleif/index.json
+https://data.opensanctions.org/graph/ua_edr/index.json
+https://data.opensanctions.org/graph/icij_offshoreleaks/index.json
+https://data.opensanctions.org/graph/cy_companies/index.json
+https://data.opensanctions.org/graph/dk_cvr/index.json
+https://data.opensanctions.org/graph/gb_coh_psc/index.json
+https://data.opensanctions.org/graph/sk_rpvs/index.json
+https://data.opensanctions.org/graph/ru_egrul/index.json

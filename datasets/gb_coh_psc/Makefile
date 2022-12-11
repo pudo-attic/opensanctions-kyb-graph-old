@@ -11,7 +11,7 @@ data/export/entities.ftm.json: data/combined.json
 	nk sorted-aggregate -o data/export/entities.ftm.json -i data/combined.json
 
 publish:
-	aws s3 sync --no-progress --cache-control "public, max-age=64600" --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/contrib/gb_coh_psc
+	aws s3 sync --no-progress --cache-control "public, max-age=64600" --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/graph/gb_coh_psc
 
 process: data/export/entities.ftm.json
 

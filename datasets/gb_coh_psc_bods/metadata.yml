@@ -3,6 +3,5 @@ title: UK Persons with significant control (PSC) Register (from OpenOwnership BO
 prefix: oo
 resources:
   - name: entities.ftm.json
-    url: https://data.opensanctions.org/contrib/uk_coh_psc/entities.ftm.json
+    url: https://data.opensanctions.org/graph/uk_coh_psc/entities.ftm.json
     mime_type: application/json+ftm
-

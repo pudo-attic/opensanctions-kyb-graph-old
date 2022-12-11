@@ -5,5 +5,5 @@ coverage:
   end: 2022-07-08
 resources:
   - name: entities.ftm.json
-    url: https://data.opensanctions.org/contrib/icij_offshoreleaks/entities.ftm.json
+    url: https://data.opensanctions.org/graph/icij_offshoreleaks/entities.ftm.json
     mime_type: application/json+ftm

@@ -3,5 +3,5 @@ title: Companies House (UK) Persons with Significant Control
 prefix: gb-coh
 resources:
   - name: entities.ftm.json
-    url: https://data.opensanctions.org/contrib/gb_coh_psc/entities.ftm.json
+    url: https://data.opensanctions.org/graph/gb_coh_psc/entities.ftm.json
     mime_type: application/json+ftm

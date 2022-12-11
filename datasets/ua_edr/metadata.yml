@@ -5,5 +5,5 @@ coverage:
   end: 2022-02-23
 resources:
   - name: entities.ftm.json
-    url: https://data.opensanctions.org/contrib/ua_edr/entities.ftm.json
+    url: https://data.opensanctions.org/graph/ua_edr/entities.ftm.json
     mime_type: application/json+ftm
