@@ -1,0 +1,27 @@
+datasets:
+  - include: https://data.opensanctions.org/graph/gleif/index.json
+  - include: https://data.opensanctions.org/graph/ua_edr/index.json
+  - include: https://data.opensanctions.org/graph/icij_offshoreleaks/index.json
+  - include: https://data.opensanctions.org/graph/cy_companies/index.json
+  - include: https://data.opensanctions.org/graph/dk_cvr/index.json
+  - include: https://data.opensanctions.org/graph/gb_coh_psc/index.json
+  - include: https://data.opensanctions.org/graph/sk_rpvs/index.json
+  - include: https://data.opensanctions.org/graph/ru_egrul/index.json
+  - name: openownership
+    title: OpenOwnership Collection
+    summary: |
+      All datasets included in the OpenOwnership Register, an aggregator of
+      datasets published in the BODS data format.
+    publisher:
+      name: OpenOwnership
+      url: https://www.openownership.org
+      description: |
+        OO helps countries generate high quality data on company ownership that
+        complies with international standards and meets the needs of data users
+        across government, civil society, and the private sector. OO supports
+        people and organisations to use this data to build trust as well as
+        reducing corruption and tax evasion.
+    children:
+      - dk_cvr
+      - sk_rpvs
+      - gb_coh_psc
