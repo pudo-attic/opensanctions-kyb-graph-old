@@ -1,7 +1,17 @@
 name: cy_companies
 title: Cyprus company registry
 prefix: cy
+summary: |
+  Cypriot open data on companies, which names their officers but not any shareholders.
 resources:
   - name: entities.ftm.json
     url: https://data.opensanctions.org/graph/cy_companies/entities.ftm.json
     mime_type: application/json+ftm
+publisher:
+  name: Department of the Registrar of Companies and Intellectual Property
+  description: |
+    Competent Service for the registration and maintenance of the register
+    of Companies, Cooperatives, Trade Names, Trade Marks, Patents,
+    Industrial Designs, etc.
+  url: https://www.companies.gov.cy/en/
+  country: cy

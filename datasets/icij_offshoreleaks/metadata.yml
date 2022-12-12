@@ -1,9 +1,20 @@
 name: icij_offshoreleaks
 title: ICIJ OffshoreLeaks
 prefix: icijol
+summary: |
+  Combined data from the Panama Papers, Paradise Papers, Pandora Papers
+  and other cross-border investigations conducted by ICIJ and its partners.
 coverage:
   end: 2022-07-08
 resources:
   - name: entities.ftm.json
     url: https://data.opensanctions.org/graph/icij_offshoreleaks/entities.ftm.json
     mime_type: application/json+ftm
+publisher:
+  name: International Consortium of Investigative Journalists (ICIJ)
+  description: |
+    ICIJ is a global network of reporters and media organizations that cooperate on
+    large-scale cross-border investigations. Its core team is a group of editors, 
+    fact-checkers and data journalists who maintain the OffshoreLeaks database.
+  url: https://www.icij.org/about/
+  official: false
