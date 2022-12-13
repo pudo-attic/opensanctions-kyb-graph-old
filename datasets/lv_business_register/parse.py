@@ -27,13 +27,15 @@ def make_bank_account(context: Zavod, row: dict):
 
 
 def parse_register(context: Zavod, row: dict):
+    reg_nr = row["regcode"]
     company = context.make("Company")
-    company.id = company_id(row["regcode"])
+    company.id = company_id(reg_nr)
     company.add("name", row["name"])
+    company.add("registrationNumber", reg_nr)
     company.add("legalForm", row["type_text"])
     company.add("incorporationDate", row["registered"])
     company.add("address", row["address"])
-    company.add("opencorporatesUrl", oc_url(row["regcode"]))
+    company.add("opencorporatesUrl", oc_url(reg_nr))
     company.add("jurisdiction", "lv")
     company.add("country", "lv")
 
