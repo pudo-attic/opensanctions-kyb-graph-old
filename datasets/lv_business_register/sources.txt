@@ -1,0 +1,9 @@
+https://dati.ur.gov.lv/beneficial_owners/beneficial_owners.csv
+https://dati.ur.gov.lv/members/members.csv
+https://dati.ur.gov.lv/members/members_joint_owners.csv
+https://dati.ur.gov.lv/officers/officers.csv
+https://dati.ur.gov.lv/register/ppi_delegated_entities.csv
+https://dati.ur.gov.lv/register/ppi_public_persons_institutions.csv
+https://dati.ur.gov.lv/register/register.csv
+https://dati.ur.gov.lv/register/register_name_history.csv
+
