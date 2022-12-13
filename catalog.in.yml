@@ -7,6 +7,8 @@ datasets:
   - include: https://data.opensanctions.org/graph/cy_companies/index.json
   - include: https://data.opensanctions.org/graph/dk_cvr/index.json
   - include: https://data.opensanctions.org/graph/sk_rpvs/index.json
+  - include: https://data.opensanctions.org/graph/ee_ariregister/index.json
+  - include: https://data.opensanctions.org/graph/lv_business_register/index.json
   - name: openownership
     title: OpenOwnership Collection
     summary: |
