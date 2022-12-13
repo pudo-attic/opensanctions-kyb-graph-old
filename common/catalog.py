@@ -21,6 +21,7 @@ def build_catalog(catalog_in: PathLike):
                 ds_data = resp.json()
             except Exception as exc:
                 print("ERROR [%s]: %s" % (include_url, exc))
+                continue
         ds = catalog.make_dataset(ds_data)
         print("Dataset: %r" % ds)
 
