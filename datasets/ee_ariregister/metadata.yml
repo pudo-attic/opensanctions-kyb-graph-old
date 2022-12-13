@@ -1,10 +1,9 @@
 name: ee_ariregister
-title: Estonia company registry
+title: Estonia e-Business Register (E-äriregister)
 prefix: ee
 summary: |
-  The e-Business Register issues free legal and statistical data about all
-  Estonian companys, non-profit associations, foundations, state and local
-  governmental agencies and self-employed persons.
+  A list of all companies registered in Estonia. The publication does not
+  include beneficial owners or directors of the companies.
 resources:
   - name: entities.ftm.json
     url: https://data.opensanctions.org/graph/ee_ariregister/entities.ftm.json
@@ -12,4 +11,8 @@ resources:
 publisher:
   name: Centre of Registers and Information Systems
   url: https://www.rik.ee/en/e-business-register
+  description: |
+    The e-Business Register issues free legal and statistical data about all
+    Estonian companys, non-profit associations, foundations, state and local
+    governmental agencies and self-employed persons.
   country: ee
