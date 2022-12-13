@@ -34,6 +34,8 @@ def parse_register(context: Zavod, row: dict):
     company.add("incorporationDate", row["registered"])
     company.add("address", row["address"])
     company.add("opencorporatesUrl", oc_url(row["regcode"]))
+    company.add("jurisdiction", "lv")
+    company.add("country", "lv")
 
     if row["terminated"]:
         company.add("dissolutionDate", row["terminated"])
