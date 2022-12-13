@@ -27,3 +27,4 @@ datasets:
       - dk_cvr
       - sk_rpvs
       - gb_coh_psc
+      - lv_business_register
