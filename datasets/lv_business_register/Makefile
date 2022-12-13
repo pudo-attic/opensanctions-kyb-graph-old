@@ -4,7 +4,7 @@ data/src:
 	mkdir -p data/src
 	wget --no-check-certificate -i ./sources.txt -P data/src
 
-data/fragments.json: parse.py
+data/fragments.json: data/src
 	python parse.py
 
 data/sorted.json: data/fragments.json
