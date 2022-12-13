@@ -37,11 +37,8 @@ def parse_register(context: Zavod, row: dict):
     company.add("address", row["address"])
     company.add("opencorporatesUrl", oc_url(reg_nr))
     company.add("jurisdiction", "lv")
-    company.add("country", "lv")
-
-    if row["terminated"]:
-        company.add("dissolutionDate", row["terminated"])
-        company.add("status", row["closed"])
+    company.add("dissolutionDate", row["terminated"])
+    company.add("status", row["closed"])
 
     if row["sepa"]:
         bankAccount = make_bank_account(context, row)
