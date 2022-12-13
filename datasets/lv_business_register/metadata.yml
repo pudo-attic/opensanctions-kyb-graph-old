@@ -1,0 +1,10 @@
+name: lv_business_register
+title: Latvia company registry
+prefix: lv
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/graph/lv_business_register/entities.ftm.json
+    mime_type: application/json+ftm
+# publisher:
+#   url: https://data.gov.lv/dati/eng/dataset/uz
+#   country: lv
