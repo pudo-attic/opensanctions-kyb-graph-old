@@ -1,6 +1,23 @@
+general = data/ettevotja_rekvisiidid__yldandmed.ijson
+officers1 = data/ettevotja_rekvisiidid__kaardile_kantud_isikud.ijson
+officers2 = data/ettevotja_rekvisiidid__kandevalised_isikud.ijson
+bfo =  data/ettevotja_rekvisiidid__kasusaajad.ijson
+sources = $(general) $(officers1) $(officers2) $(bfo)
+
 all: clean process publish
 
-data/fragments.json: parse.py
+download: $(sources)
+
+$(sources): data/%.ijson: data/%.zip
+	unzip -j data/$*.zip $*.json -d data
+	jq -c ".[]" data/$*.json > data/$*.ijson
+	rm data/$*.json
+
+data/%.zip:
+	mkdir -p data
+	curl -o data/$*.zip https://avaandmed.ariregister.rik.ee/sites/default/files/avaandmed/$*.json.zip
+
+data/fragments.json: download
 	python parse.py
 
 data/sorted.json: data/fragments.json

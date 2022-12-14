@@ -1,55 +1,21 @@
-"""
-columns:
-
-  1: nimi
-  2: ariregistri_kood
-  3: ettevotja_oiguslik_vorm
-  4: ettevotja_oigusliku_vormi_alaliik
-  5: kmkr_nr
-  6: ettevotja_staatus
-  7: ettevotja_staatus_tekstina
-  8: ettevotja_esmakande_kpv
-  9: ettevotja_aadress
- 10: asukoht_ettevotja_aadressis
- 11: asukoha_ehak_kood
- 12: asukoha_ehak_tekstina
- 13: indeks_ettevotja_aadressis
- 14: ads_adr_id
- 15: ads_ads_oid
- 16: ads_normaliseeritud_taisaadress
- 17: teabesysteemi_link
-
-translated:
-
-  1: name
-  2: registration_code
-  3: holder_legal_form
-  4: type_of_business_form_type
-  5: kmkr_nr
-  6: holder_status
-  7: holder_status_as_Text
-  8: date of first establishment
-  9: holder_address
- 10: location_at_address_of_business_holder
- 11: location_address_code
- 12: place_of_establishment_as_text
- 13: index_at_address_of_holder
- 14: ads_adr_id
- 15: ads_ads_oid
- 16: ads_normalised_address
- 17: information_system_link
-
-"""
-
-import csv
 from datetime import datetime
-from io import TextIOWrapper
-from typing import Optional
-from zipfile import ZipFile
+from typing import Any, Callable, Optional, Tuple
 
+import orjson
+import shortuuid
+from fingerprints import generate as fp
+from followthemoney.util import make_entity_id
+from nomenklatura.entity import CE
 from zavod import Zavod, init_context
 
-URL = "https://avaandmed.rik.ee/andmed/ARIREGISTER/ariregister_csv.zip"
+# https://avaandmed.ariregister.rik.ee/en/downloading-open-data
+SOURCES = {
+    "general": "ettevotja_rekvisiidid__yldandmed.ijson",
+    "officers1": "ettevotja_rekvisiidid__kaardile_kantud_isikud.ijson",
+    "officers2": "ettevotja_rekvisiidid__kandevalised_isikud.ijson",
+    "bfo": "ettevotja_rekvisiidid__kasusaajad.ijson",
+}
+
 TYPES = {
     "Füüsilisest isikust ettevõtja": "Person",  # Self-employed person
     "Kohaliku omavalitsuse asutus": "PublicBody",  # Local government body
@@ -59,49 +25,180 @@ TYPES = {
 }
 
 
-def iter_rows(zip: ZipFile, name: str):
-    with zip.open(name, "r") as fh:
-        wrapper = TextIOWrapper(fh, encoding="utf-8-sig")
-        for row in csv.DictReader(wrapper, delimiter=";"):
-            yield row
+def get_value(
+    data: dict, keys: Tuple[str], default: Optional[Any] = None
+) -> Optional[str]:
+    for key in keys:
+        val = data.pop(key, None)
+        if val is not None:
+            return val
+    return default
 
 
-def parse_date(value: str) -> Optional[str]:
+def parse_date(value: Optional[str] = None) -> Optional[str]:
+    if not value:
+        return None
     try:
         return datetime.strptime(value, "%d.%m.%Y").date().isoformat()
     except ValueError:
         return None
 
 
-def proxy_id(context: Zavod, row: dict) -> Optional[str]:
-    if row["kmkr_nr"]:
-        return context.make_slug("vat", row["kmkr_nr"])
-    if row["ariregistri_kood"]:
-        return context.make_slug(row["ariregistri_kood"])
-    context.log.warn("No id for proxy")
+def get_address(data: dict) -> Optional[str]:
+    value = data.pop("aadress_ads__ads_normaliseeritud_taisaadress", None)
+    if value is not None:
+        return value
+    parts = []
+    for key in ("aadress_ehak_tekstina", "aadress_tanav_maja_korter"):
+        value = data.pop(key, None)
+        if value is not None:
+            parts.append(value)
+    if parts:
+        return ", ".join(parts).strip(", ")
 
 
-def parse_row(context: Zavod, row: dict):
-    proxy = context.make(TYPES.get(row["ettevotja_oiguslik_vorm"], "Company"))
-    proxy.id = proxy_id(context, row)
-    proxy.add("name", row["nimi"])
-    proxy.add("legalForm", row["ettevotja_oiguslik_vorm"])
-    proxy.add("incorporationDate", parse_date(row["ettevotja_esmakande_kpv"]))
-    proxy.add("address", row["ads_normaliseeritud_taisaadress"])
-    proxy.add("sourceUrl", row["teabesysteemi_link"])
-    proxy.add("status", row["ettevotja_staatus_tekstina"])
+def make_proxy(context: Zavod, row: dict, schema: Optional[str] = "LegalEntity") -> CE:
+    proxy = context.make(schema)
+    ident = row.pop("ariregistri_kood")
+    proxy.id = context.make_slug(ident)
+    proxy.add("registrationNumber", ident)
+    proxy.add("name", row.pop("nimi"))
+    proxy.add("sourceUrl", f"https://ariregister.rik.ee/eng/company/{ident}")
     proxy.add("jurisdiction", "ee")
+    return proxy
+
+
+def make_officer(context: Zavod, data: dict) -> CE:
+    legal_form = data.pop("isiku_tyyp", None)
+    id_number = get_value(data, ("isikukood_registrikood", "isikukood"))
+    first_name, last_name = data.pop("eesnimi", None), get_value(
+        data, ("nimi_arinimi", "nimi")
+    )
+    if legal_form == "F":
+        proxy = context.make("Person")
+        proxy.add("idNumber", id_number)
+        proxy.add("firstName", first_name)
+        proxy.add("lastName", last_name)
+        if first_name and last_name:
+            proxy.add("name", " ".join((first_name, last_name)))
+    else:
+        proxy = context.make("LegalEntity")
+        proxy.add("name", " ".join((first_name or "", last_name or "")).strip())
+
+    address = get_address(data)
+    proxy.id = context.make_slug(id_number)
+    if proxy.id is None:
+        ident_id = make_entity_id(fp(address))
+        if ident_id is None:
+            ident_id = shortuuid.uuid()
+        proxy.id = context.make_slug("officer", fp(proxy.caption), ident_id)
+
+    proxy.add("registrationNumber", id_number)
+    proxy.add("country", data.pop("aadress_riik"))
+    proxy.add("email", data.pop("email", None))
+    proxy.add("address", address)
+    return proxy
+
+
+def make_rel(
+    context, company: CE, officer: CE, schema: str, data, role: Optional[str] = None
+) -> CE:
+    rel = context.make(schema)
+    rel.id = context.make_slug(
+        rel.schema.name, company.id, officer.id, fp(role), strict=False
+    )
+    rel.add("startDate", parse_date(data.pop("algus_kpv")))
+    rel.add("endDate", parse_date(data.pop("lopp_kpv")))
+    rel.add("role", role)
+    if schema == "Ownership":
+        rel.add("owner", officer)
+        rel.add("asset", company)
+    elif schema == "Directorship":
+        rel.add("director", officer)
+        rel.add("organization", company)
+    return rel
+
+
+def parse_general(context: Zavod, row: dict):
+    data = row.pop("yldandmed")
+    legal_form = data.pop("oiguslik_vorm_tekstina")
+    proxy = make_proxy(context, row, TYPES.get(legal_form, "Company"))
+    proxy.add("legalForm", legal_form)
+    for item in data.pop("staatused"):
+        if item["staatus"] == "R":
+            proxy.add("incorporationDate", parse_date(item["algus_kpv"]))
+    for item in get_value(data, ("aadressid", "kontaktisiku_aadressid"), []):
+        proxy.add("address", get_address(item))
+    proxy.add(
+        "status", get_value(data, ("staatus_tekstina", "ettevotja_staatus_tekstina"))
+    )
+
+    for contact in data.pop("sidevahendid", []):
+        if contact["liik"] == "EMAIL":
+            proxy.add("email", contact["sisu"])
+        elif contact["liik"] == "WWW":
+            proxy.add("website", contact["sisu"])
+        elif contact["liik"] in ("MOB", "TEL"):
+            proxy.add("phone", contact["sisu"])
+
     context.emit(proxy)
 
 
+def parse_officer(context: Zavod, row: dict):
+    company = make_proxy(context, row)
+    context.emit(company)
+
+    for data in get_value(row, ("kaardile_kantud_isikud", "kaardivalised_isikud")):
+        officer = make_officer(context, data)
+        rel_type = data.pop("isiku_roll")
+        role = data.pop("isiku_roll_tekstina")
+        if rel_type == "O":
+            rel = make_rel(context, company, officer, "Ownership", data, role)
+            rel.add("percentage", data.pop("osaluse_protsent"))
+            rel.add("sharesValue", data.pop("osaluse_suurus"))
+            rel.add("sharesCurrency", data.pop("osaluse_valuuta"))
+        else:
+            rel = make_rel(context, company, officer, "Directorship", data, role)
+        context.emit(officer)
+        context.emit(rel)
+
+
+def parse_bfo(context: Zavod, row: dict):
+    company = make_proxy(context, row)
+    context.emit(company)
+
+    for data in row.pop("kasusaajad"):
+        officer = make_officer(context, data)
+        rel = make_rel(
+            context,
+            company,
+            officer,
+            "Ownership",
+            data,
+            data.pop("kontrolli_teostamise_viis_tekstina"),
+        )
+        context.emit(officer)
+        context.emit(rel)
+
+
+def parse_json(context: Zavod, source: str, handler: Callable):
+    data_path = context.get_resource_path(source)
+    with open(data_path, "r") as f:
+        for line in f.readlines():
+            data = orjson.loads(line)
+            handler(context, data)
+
+
 def parse(context: Zavod):
-    data_path = context.fetch_resource("data.zip", URL)
-    with ZipFile(data_path, "r") as zip:
-        for name in zip.namelist():
-            if name.startswith("ettevotja_rekvisiidid"):
-                rows = iter_rows(zip, name)
-                for row in rows:
-                    parse_row(context, row)
+    # general data
+    parse_json(context, SOURCES["general"], parse_general)
+
+    # officers
+    parse_json(context, SOURCES["officers1"], parse_officer)
+    parse_json(context, SOURCES["officers2"], parse_officer)
+
+    # bfo data
+    parse_json(context, SOURCES["bfo"], parse_bfo)
 
 
 if __name__ == "__main__":
