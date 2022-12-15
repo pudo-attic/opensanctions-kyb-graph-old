@@ -1,4 +1,4 @@
-name: process-corpwatch
+name: process-us_corpwatch
 
 on:
   schedule:
@@ -11,7 +11,7 @@ jobs:
     container: ghcr.io/opensanctions/graph-etl:main
     defaults:
       run:
-        working-directory: /graph/datasets/corpwatch
+        working-directory: /graph/datasets/us_corpwatch
     steps:
       - name: Parse and write the registry
         run: |

@@ -1,6 +1,6 @@
-name: corpwatch
+name: us_corpwatch
 title: US Corpwatch EX-21 Filings
-prefix: cw
+prefix: us
 summary: |
   Subsidiary relationship information from Exhibit 21 of companies' 10-K
   filings with the SEC
