@@ -1,4 +1,4 @@
-name: process-gleif
+name: process-md_companies
 
 on:
   schedule:
