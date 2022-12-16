@@ -15,7 +15,8 @@ def read_ckan(context: Zavod) -> str:
 
     resource_url = None
     for res_anchor in doc.findall('.//li[@class="resource-item"]/a'):
-        resource_url = urljoin(context.dataset.url, res_anchor.get("href"))
+        res_href = res_anchor.get("href", "")
+        resource_url = urljoin(context.dataset.url, res_href)
 
     if resource_url is None:
         raise RuntimeError("No resource URL on data catalog page!")
