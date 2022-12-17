@@ -1,0 +1,22 @@
+name: us_corpwatch
+title: US Corpwatch EX-21 Filings
+prefix: us
+summary: |
+  Subsidiary relationship information from Exhibit 21 of companies' 10-K
+  filings with the SEC
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/graph/corpwatch/entities.ftm.json
+    mime_type: application/json+ftm
+publisher:
+  name: CorpWatch
+  url: https://corpwatch.org
+  description: |
+    The data provided here is funded and developed by CorpWatch.org, a
+    non-profit which works to promote environmental, social and human rights at
+    the local, national and global levels by holding multinational corporations
+    accountable for their actions. We employ investigative research and
+    journalism to provide critical information on corporate malfeasance and
+    profiteering around the world to foster a more informed public and an
+    effective democracy.
+  country: us
