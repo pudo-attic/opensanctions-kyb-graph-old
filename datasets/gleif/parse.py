@@ -155,7 +155,7 @@ def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
         if idx > 0 and idx % 10000 == 0:
             context.log.info("Parse LEIRecord: %d..." % idx)
         elc = remove_namespace(el)
-        proxy = context.make("LegalEntity")
+        proxy = context.make("Organization")
         lei = elc.findtext("LEI")
         if lei is None:
             continue
