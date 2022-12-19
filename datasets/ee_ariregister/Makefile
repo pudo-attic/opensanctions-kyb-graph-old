@@ -1,17 +1,15 @@
-general = data/ettevotja_rekvisiidid__yldandmed.ijson
-officers1 = data/ettevotja_rekvisiidid__kaardile_kantud_isikud.ijson
-officers2 = data/ettevotja_rekvisiidid__kandevalised_isikud.ijson
-bfo =  data/ettevotja_rekvisiidid__kasusaajad.ijson
+general = data/ettevotja_rekvisiidid__yldandmed.json
+officers1 = data/ettevotja_rekvisiidid__kaardile_kantud_isikud.json
+officers2 = data/ettevotja_rekvisiidid__kandevalised_isikud.json
+bfo =  data/ettevotja_rekvisiidid__kasusaajad.json
 sources = $(general) $(officers1) $(officers2) $(bfo)
 
 all: clean process publish
 
 download: $(sources)
 
-$(sources): data/%.ijson: data/%.zip
+$(sources): data/%.json: data/%.zip
 	unzip -j data/$*.zip $*.json -d data
-	jq -c ".[]" data/$*.json > data/$*.ijson
-	rm data/$*.json
 
 data/%.zip:
 	mkdir -p data

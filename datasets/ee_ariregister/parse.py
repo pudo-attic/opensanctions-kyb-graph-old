@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Callable, Optional, Tuple
 
-import orjson
+import ijson
 import shortuuid
 from fingerprints import generate as fp
 from followthemoney.util import make_entity_id
@@ -10,10 +10,10 @@ from zavod import Zavod, init_context
 
 # https://avaandmed.ariregister.rik.ee/en/downloading-open-data
 SOURCES = {
-    "general": "ettevotja_rekvisiidid__yldandmed.ijson",
-    "officers1": "ettevotja_rekvisiidid__kaardile_kantud_isikud.ijson",
-    "officers2": "ettevotja_rekvisiidid__kandevalised_isikud.ijson",
-    "bfo": "ettevotja_rekvisiidid__kasusaajad.ijson",
+    "general": "ettevotja_rekvisiidid__yldandmed.json",
+    "officers1": "ettevotja_rekvisiidid__kaardile_kantud_isikud.json",
+    "officers2": "ettevotja_rekvisiidid__kandevalised_isikud.json",
+    "bfo": "ettevotja_rekvisiidid__kasusaajad.json",
 }
 
 TYPES = {
@@ -183,10 +183,15 @@ def parse_bfo(context: Zavod, row: dict):
 
 def parse_json(context: Zavod, source: str, handler: Callable):
     data_path = context.get_resource_path(source)
+    ix = 0
     with open(data_path, "r") as f:
-        for line in f.readlines():
-            data = orjson.loads(line)
-            handler(context, data)
+        items = ijson.items(f, "item")
+        for ix, item in enumerate(items):
+            handler(context, item)
+            if ix and ix % 10_000 == 0:
+                context.log.info("Parse ijson item %d ..." % ix)
+    if ix:
+        context.log.info("Parsed %d ijson items." % (ix + 1), fp=data_path.name)
 
 
 def parse(context: Zavod):
