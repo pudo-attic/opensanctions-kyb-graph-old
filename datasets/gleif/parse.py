@@ -1,13 +1,14 @@
 import csv
-import requests
-from pathlib import Path
-from zipfile import ZipFile
-from lxml import etree, html
-from io import TextIOWrapper
-from normality import slugify
-from urllib.parse import urljoin
 from contextlib import contextmanager
+from io import TextIOWrapper
+from pathlib import Path
 from typing import BinaryIO, Dict, List, Optional, Tuple
+from urllib.parse import urljoin
+from zipfile import ZipFile
+
+import requests
+from lxml import etree, html
+from normality import slugify
 from zavod import Zavod, init_context
 from zavod.parse import remove_namespace
 
@@ -154,7 +155,7 @@ def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
         if idx > 0 and idx % 10000 == 0:
             context.log.info("Parse LEIRecord: %d..." % idx)
         elc = remove_namespace(el)
-        proxy = context.make("Company")
+        proxy = context.make("Organization")
         lei = elc.findtext("LEI")
         if lei is None:
             continue
