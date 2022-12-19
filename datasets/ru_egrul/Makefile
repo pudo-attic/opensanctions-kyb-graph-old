@@ -13,7 +13,7 @@ data/fragments.json:
 process: data/export/entities.ftm.json
 
 publish:
-	aws s3 sync --no-progress --cache-control "public, max-age=64600" --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/graph/ru_egrul
+	bash ../../upload.sh ru_egrul data/export
 
 clean:
 	rm -rf data/export data/fragments.json data/sorted.json
