@@ -5,13 +5,13 @@ data/fragments.json: parse.py
 
 data/combined.json: data/fragments.json
 	sort -o data/combined.json data/fragments.json
-          
+
 data/export/entities.ftm.json: data/combined.json
 	mkdir -p data/export
 	nk sorted-aggregate -o data/export/entities.ftm.json -i data/combined.json
 
 publish:
-	aws s3 sync --no-progress --cache-control "public, max-age=64600" --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/graph/gb_coh_psc
+	bash ../../upload.sh gb_coh_psc data/export
 
 process: data/export/entities.ftm.json
 
