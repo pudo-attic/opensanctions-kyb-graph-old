@@ -2,7 +2,7 @@ all: clean process publish
 
 data/src:
 	mkdir -p data/src
-	wget -O data/src/corpwatch.tar.gz https://archive.org/download/corpwatch_api_data_dumps/corpwatch_api_tables_csv.tar.gz
+	wget -q -O data/src/corpwatch.tar.gz https://archive.org/download/corpwatch_api_data_dumps/corpwatch_api_tables_csv.tar.gz
 	tar -C data/src/ -xvf data/src/corpwatch.tar.gz
 	rm data/src/corpwatch.tar.gz
 
