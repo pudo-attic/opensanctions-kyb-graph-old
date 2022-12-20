@@ -1,12 +1,13 @@
 name: us_corpwatch
-title: US Corpwatch EX-21 Filings
+title: US CorpWatch EX-21 Filings
 prefix: us-cw
 summary: |
   Subsidiary relationship information from Exhibit 21 of companies' 10-K
-  filings with the SEC
+  filings with the SEC (global subsidiaries of all publicly-listed companies
+  in the US).
 resources:
   - name: entities.ftm.json
-    url: https://data.opensanctions.org/graph/corpwatch/entities.ftm.json
+    url: https://data.opensanctions.org/graph/us_corpwatch/entities.ftm.json
     mime_type: application/json+ftm
 publisher:
   name: CorpWatch
