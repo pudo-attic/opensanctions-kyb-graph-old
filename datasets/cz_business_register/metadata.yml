@@ -1,10 +1,20 @@
 name: cz_business_register
 title: Czechia business register
 prefix: cz
+summary: |
+  Czech business register with company metadata and directorships as obtained
+  from the open data xml dump by ARES.
 resources:
   - name: entities.ftm.json
     url: https://data.opensanctions.org/graph/cz_business_register/entities.ftm.json
     mime_type: application/json+ftm
-# publisher:
-#   url: https://data.gov.lv/dati/eng/dataset/uz
-#   country: lv
+publisher:
+  name: Administrativní registr ekonomických subjektů (ARES)
+  url: http://wwwinfo.mfcr.cz/ares/ares.html.en
+  description: |
+    The Administrative Register of Economic Entities is an information system
+    that allows searching over economic entities registered in the Czech
+    Republic. It facilitates the display of data held in the individual registers
+    of the state administration from which it draws data (the so-called source
+    registers).
+  country: cz
