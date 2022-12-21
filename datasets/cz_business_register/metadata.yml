@@ -1,0 +1,10 @@
+name: cz_business_register
+title: Czechia business register
+prefix: cz
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/graph/cz_business_register/entities.ftm.json
+    mime_type: application/json+ftm
+# publisher:
+#   url: https://data.gov.lv/dati/eng/dataset/uz
+#   country: lv
