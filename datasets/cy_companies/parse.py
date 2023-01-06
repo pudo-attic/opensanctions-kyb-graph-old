@@ -51,7 +51,7 @@ def parse_organisations(context: Zavod, rows):
             entity.add("jurisdiction", "cy")
         org_type_oc = TYPES[org_type]
         oc_id = f"{org_type_oc}{reg_nr}"
-        oc_url = f"https://opencorporates.com/companies/he/{oc_id}"
+        oc_url = f"https://opencorporates.com/companies/cy/{oc_id}"
         entity.add("opencorporatesUrl", oc_url)
         entity.add("registrationNumber", oc_id)
         entity.add("registrationNumber", f"{org_type}{reg_nr}")
