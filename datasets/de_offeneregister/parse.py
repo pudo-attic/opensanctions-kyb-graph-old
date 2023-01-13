@@ -148,7 +148,8 @@ def make_company(context: Zavod, data: dict[str, Any]) -> CE:
     # FIXME? better gleif matching:
     proxy.add("registrationNumber", f'{reg_art} {meta.pop("_registerNummer")}')
     proxy.add("status", data.pop("current_status", None))
-    proxy.add("opencorporatesUrl", f"https://opencorporates.com/companies/de/{reg_nr}")
+    oc_id = data.pop("company_number")
+    proxy.add("opencorporatesUrl", f"https://opencorporates.com/companies/de/{oc_id}")
     proxy.add("jurisdiction", data.pop("jurisdiction_code"))
     proxy.add("name", data.pop("name"))
     proxy.add("address", data.pop("registered_address", None))
