@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any, Callable, Optional, Tuple
 
 import ijson
-import shortuuid
 from fingerprints import generate as fp
 from followthemoney.util import make_entity_id
 from nomenklatura.entity import CE
@@ -68,7 +67,7 @@ def make_proxy(context: Zavod, row: dict, schema: Optional[str] = "LegalEntity")
     return proxy
 
 
-def make_officer(context: Zavod, data: dict) -> CE:
+def make_officer(context: Zavod, data: dict, company_id: str) -> CE:
     legal_form = data.pop("isiku_tyyp", None)
     id_number = get_value(data, ("isikukood_registrikood", "isikukood"))
     first_name, last_name = data.pop("eesnimi", None), get_value(
@@ -90,7 +89,7 @@ def make_officer(context: Zavod, data: dict) -> CE:
     if proxy.id is None:
         ident_id = make_entity_id(fp(address))
         if ident_id is None:
-            ident_id = shortuuid.uuid()
+            ident_id = id_number or company_id
         proxy.id = context.make_slug("officer", fp(proxy.caption), ident_id)
 
     proxy.add("registrationNumber", id_number)
@@ -149,7 +148,7 @@ def parse_officer(context: Zavod, row: dict):
     context.emit(company)
 
     for data in get_value(row, ("kaardile_kantud_isikud", "kaardivalised_isikud")):
-        officer = make_officer(context, data)
+        officer = make_officer(context, data, company.id)
         rel_type = data.pop("isiku_roll")
         role = data.pop("isiku_roll_tekstina")
         if rel_type == "O":
@@ -168,7 +167,7 @@ def parse_bfo(context: Zavod, row: dict):
     context.emit(company)
 
     for data in row.pop("kasusaajad"):
-        officer = make_officer(context, data)
+        officer = make_officer(context, data, company.id)
         rel = make_rel(
             context,
             company,
