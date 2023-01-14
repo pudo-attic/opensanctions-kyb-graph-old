@@ -30,3 +30,21 @@ datasets:
       - sk_rpvs
       - gb_coh_psc
       - lv_business_register
+  - name: graph
+    title: OpenSanctions Graph
+    publisher:
+      name: OpenSanctions
+      url: https://www.opensanctions.org
+    children:
+      - icij_offshoreleaks
+      - gleif
+      - gb_coh_psc
+      - dk_cvr
+      - sk_rpvs
+      - lv_business_register
+      - ru_egrul
+      - ua_edr
+      - md_companies
+      - cy_companies
+      - ee_ariregister
+      - us_corpwatch
