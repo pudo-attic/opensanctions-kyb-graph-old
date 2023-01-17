@@ -2,7 +2,7 @@ import csv
 from contextlib import contextmanager
 from io import TextIOWrapper
 from pathlib import Path
-from typing import BinaryIO, Dict, List, Optional, Tuple
+from typing import BinaryIO, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin
 from zipfile import ZipFile
 
@@ -11,6 +11,7 @@ from lxml import etree, html
 from normality import slugify
 from zavod import Zavod, init_context
 from zavod.parse import remove_namespace
+from zavod.parse.addresses import format_line
 
 LEI = "http://www.gleif.org/data/schema/leidata/2016"
 RR = "http://www.gleif.org/data/schema/rr/2016"
@@ -18,8 +19,6 @@ RR = "http://www.gleif.org/data/schema/rr/2016"
 CAT_URL = "https://www.gleif.org/en/lei-data/gleif-concatenated-file/download-the-concatenated-file"
 BIC_URL = "https://www.gleif.org/en/lei-data/lei-mapping/download-bic-to-lei-relationship-files"
 ISIN_URL = "https://www.gleif.org/en/lei-data/lei-mapping/download-isin-to-lei-relationship-files"
-
-# TODO: addresses!
 
 RELATIONSHIPS: Dict[str, Tuple[str, str, str]] = {
     "IS_FUND-MANAGED_BY": ("Directorship", "organization", "director"),
@@ -29,6 +28,23 @@ RELATIONSHIPS: Dict[str, Tuple[str, str, str]] = {
     "IS_INTERNATIONAL_BRANCH_OF": ("Ownership", "asset", "owner"),
     "IS_FEEDER_TO": ("UnknownLink", "subject", "object"),
 }
+
+
+ADDRESS_PARTS: Dict[str, str] = {
+    # map paths to zavod.parse.format_line input
+    "City": "city",
+    "Region": "state",
+    "Country": "country_code",
+    "PostalCode": "postal_code",
+}
+
+
+def make_address(el: etree._Element) -> str:
+    parts: Dict[str, Union[str, None]] = {"summary": el.text}  # FirstAddressLine
+    parent = el.getparent()
+    for tag, key in ADDRESS_PARTS.items():
+        parts[key] = parent.findtext(tag)
+    return format_line(**parts)
 
 
 def load_elfs() -> Dict[str, str]:
@@ -205,6 +221,9 @@ def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
             succession.add("predecessor", lei)
             succession.add("successor", lei_id(succ_lei))
             context.emit(succession)
+
+        for address_el in el.findall(".//FirstAddressLine"):
+            proxy.add("address", make_address(address_el))
 
         el.clear()
         context.emit(proxy)
