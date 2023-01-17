@@ -12,6 +12,7 @@ datasets:
   - include: https://data.opensanctions.org/graph/lv_business_register/index.json
   - include: https://data.opensanctions.org/graph/cz_business_register/index.json
   - include: https://data.opensanctions.org/graph/us_corpwatch/index.json
+  - include: https://data.opensanctions.org/graph/de_offeneregister/index.json
   - name: openownership
     title: OpenOwnership Collection
     summary: |

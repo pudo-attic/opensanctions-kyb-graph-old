@@ -1,0 +1,19 @@
+name: de_offeneregister
+title: Deutsches Handelsregister (OffeneRegister.de)
+prefix: de-oc
+summary: |
+  The OpenCorporates dump of the german companies registry, recent until end of
+  2018, as published via OffeneRegister.de. Includes companies (HRA/HRB),
+  organizations (VR/GnR/PR) and their officers. For some of the companies
+  there is as well ownership data, but without share values.
+resources:
+  - name: entities.ftm.json
+    url: https://data.opensanctions.org/graph/de_offeneregister/entities.ftm.json
+    mime_type: application/json+ftm
+publisher:
+  name: OffeneRegister.de / OKF DE
+  url: https://offeneregister.de/
+  country: de
+  description: |
+    OffeneRegister.de is a project of the Open Knowledge Foundation Deutschland
+    e.V. with data from OpenCorporates.
