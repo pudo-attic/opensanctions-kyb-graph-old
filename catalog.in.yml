@@ -51,3 +51,4 @@ datasets:
       - cy_companies
       - ee_ariregister
       - us_corpwatch
+      - de_offeneregister
