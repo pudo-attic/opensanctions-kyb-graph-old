@@ -1,8 +1,8 @@
 import csv
 from pathlib import Path
+from normality import slugify
 from typing import Callable, Optional, Union
 
-from fingerprints import generate as fp
 from nomenklatura.entity import CE
 from zavod import Zavod, init_context
 from zavod.parse.addresses import format_line
@@ -77,7 +77,8 @@ def parse_company_locations(context: Zavod, row: dict):
             state=clean(row.pop("state")),
             country_code=country_code.lower(),
         )
-        if fp(address):  # don't add addresses consisting only of placeholder characters
+        # don't add addresses consisting only of placeholder characters:
+        if slugify(address) is not None:
             proxy.add("address", address)
         context.emit(proxy)
 

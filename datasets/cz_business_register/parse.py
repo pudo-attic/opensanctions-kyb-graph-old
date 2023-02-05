@@ -1,8 +1,8 @@
 import tarfile
+from normality import slugify
 from io import BufferedReader
 from typing import Optional
 
-from fingerprints import generate as fp
 from followthemoney.util import make_entity_id
 from lxml import etree
 from nomenklatura.entity import CE
@@ -18,13 +18,13 @@ def company_id(
 ) -> Optional[str]:
     if reg_nr:
         return f"oc-companies-cz-{reg_nr}"
-    return context.make_slug("company", fp(name))
+    return context.make_slug("company", name)
 
 
 def person_id(context: Zavod, name: str, address: str, company_id: str) -> str:
-    if fp(address):
-        return context.make_slug("person", fp(name), make_entity_id(fp(address)))
-    return context.make_slug("person", fp(name), make_entity_id(company_id))
+    if slugify(address) is not None:
+        return context.make_slug("person", name, make_entity_id(address))
+    return context.make_slug("person", name, make_entity_id(company_id))
 
 
 def make_address(tree: Optional[ElementOrTree] = None) -> Optional[str]:

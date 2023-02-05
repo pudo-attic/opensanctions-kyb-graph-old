@@ -4,7 +4,6 @@ from functools import lru_cache
 from typing import Any, Optional
 
 import orjson
-from fingerprints import generate as fp
 from followthemoney.util import join_text, make_entity_id
 from nomenklatura.entity import CE
 from zavod import Zavod, init_context
@@ -115,18 +114,16 @@ def make_officer_and_rel(context: Zavod, company: CE, data: dict[str, Any]):
             rel_summary = parsed_data.pop("summary")
         else:
             proxy.add("name", name)
-            proxy.id = context.make_slug(
-                "officer", make_entity_id(company.id, fp(name))
-            )
+            proxy.id = context.make_slug("officer", make_entity_id(company.id, name))
     elif type_ == "person":
         proxy = context.make("Person")
         proxy.add("name", name)
-        proxy.id = context.make_slug("officer", make_entity_id(company.id, fp(name)))
+        proxy.id = context.make_slug("officer", make_entity_id(company.id, name))
     else:
         context.log.warning("Unknown type: %s" % type_)
         proxy = context.make("LegalEntity")
         proxy.add("name", name)
-        proxy.id = context.make_slug("officer", make_entity_id(company.id, fp(name)))
+        proxy.id = context.make_slug("officer", make_entity_id(company.id, name))
 
     for key, value in data.get("other_attributes", {}).items():
         if key in MAPPING:
