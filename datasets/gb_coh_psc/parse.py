@@ -17,7 +17,9 @@ PSC_URL = "http://download.companieshouse.gov.uk/en_pscdata.html"
 
 KINDS = {
     "individual-person-with-significant-control": "Person",
+    "individual-beneficial-owner": "Person",
     "corporate-entity-person-with-significant-control": "Company",
+    "corporate-entity-beneficial-owner": "Company",
     "legal-person-person-with-significant-control": "Organization",
     "super-secure-person-with-significant-control": "",
     "persons-with-significant-control-statement": "",
