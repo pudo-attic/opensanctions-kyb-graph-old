@@ -3,6 +3,7 @@ FROM ubuntu:22.10
 LABEL org.opencontainers.image.title "OpenSanctions Graph ETL"
 LABEL org.opencontainers.image.source https://github.com/opensanctions/graph
 
+RUN sed -i -e 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//mirror:\/\/mirrors\.ubuntu\.com\/mirrors\.txt/' /etc/apt/sources.list
 RUN apt-get -qq -y update \
     && apt-get -qq -y upgrade \
     && apt-get -qq -y install locales ca-certificates curl python3-pip \
