@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.10
 
 LABEL org.opencontainers.image.title "OpenSanctions Graph ETL"
 LABEL org.opencontainers.image.source https://github.com/opensanctions/graph
