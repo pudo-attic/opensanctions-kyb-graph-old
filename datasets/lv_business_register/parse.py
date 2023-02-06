@@ -1,7 +1,6 @@
 import csv
 from typing import Optional
 
-from fingerprints import generate as fp
 from zavod import Zavod, init_context
 
 TYPES = {
@@ -19,7 +18,7 @@ def company_id(
     if reg_nr:
         return f"oc-companies-lv-{reg_nr}".lower()
     if name is not None:
-        return context.make_slug("company", fp(name))
+        return context.make_slug("company", name)
     context.log.warn("No id for company")
 
 

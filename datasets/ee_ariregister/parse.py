@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any, Callable, Optional, Tuple
 
 import ijson
-from fingerprints import generate as fp
 from followthemoney.util import make_entity_id
 from nomenklatura.entity import CE
 from zavod import Zavod, init_context
@@ -87,10 +86,10 @@ def make_officer(context: Zavod, data: dict, company_id: str) -> CE:
     address = get_address(data)
     proxy.id = context.make_slug(id_number)
     if proxy.id is None:
-        ident_id = make_entity_id(fp(address))
+        ident_id = make_entity_id(address)
         if ident_id is None:
             ident_id = id_number or company_id
-        proxy.id = context.make_slug("officer", fp(proxy.caption), ident_id)
+        proxy.id = context.make_slug("officer", proxy.caption, ident_id)
 
     proxy.add("registrationNumber", id_number)
     proxy.add("country", data.pop("aadress_riik"))
@@ -104,7 +103,7 @@ def make_rel(
 ) -> CE:
     rel = context.make(schema)
     rel.id = context.make_slug(
-        rel.schema.name, company.id, officer.id, fp(role), strict=False
+        rel.schema.name, company.id, officer.id, role, strict=False
     )
     rel.add("startDate", parse_date(data.pop("algus_kpv")))
     rel.add("endDate", parse_date(data.pop("lopp_kpv")))
