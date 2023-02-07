@@ -152,8 +152,8 @@ def parse_psc_data(context: Zavod):
     for idx, row in enumerate(read_psc_data(data_path)):
         if idx > 0 and idx % 10000 == 0:
             context.log.info("PSC statements: %d..." % idx)
-        if idx < 9_600_000:
-            continue
+        # if idx < 9_600_000:
+        #     continue
         company_nr = row.pop("company_number", None)
         if company_nr is None:
             context.log.warning("No company number: %r" % row)
