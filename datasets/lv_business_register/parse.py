@@ -31,7 +31,7 @@ def person_name(row: dict) -> str:
 def person_id(context: Zavod, row: dict) -> str:
     return context.make_slug(
         "person",
-        fp(person_name(row)),
+        person_name(row),
         row["latvian_identity_number_masked"],
         row["birth_date"],
         strict=False,
