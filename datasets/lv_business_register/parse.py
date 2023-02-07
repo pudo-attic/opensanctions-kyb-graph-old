@@ -29,12 +29,11 @@ def person_name(row: dict) -> str:
 
 
 def person_id(context: Zavod, row: dict) -> str:
-    return context.make_slug(
+    return context.make_id(
         "person",
         person_name(row),
         row["latvian_identity_number_masked"],
         row["birth_date"],
-        strict=False,
     )
 
 
