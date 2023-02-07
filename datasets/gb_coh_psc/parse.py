@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 
 from zavod import PathLike, init_context, Zavod
 from zavod.parse import make_address
+from zavod.audit import audit_data
 
 BASE_URL = "http://download.companieshouse.gov.uk/en_output.html"
 PSC_URL = "http://download.companieshouse.gov.uk/en_pscdata.html"
@@ -21,6 +22,7 @@ KINDS = {
     "corporate-entity-person-with-significant-control": "Company",
     "corporate-entity-beneficial-owner": "Company",
     "legal-person-person-with-significant-control": "Organization",
+    "legal-person-beneficial-owner": "Organization",
     "super-secure-person-with-significant-control": "",
     "persons-with-significant-control-statement": "",
     "exemptions": "",
@@ -150,6 +152,8 @@ def parse_psc_data(context: Zavod):
     for idx, row in enumerate(read_psc_data(data_path)):
         if idx > 0 and idx % 10000 == 0:
             context.log.info("PSC statements: %d..." % idx)
+        if idx < 9_600_000:
+            continue
         company_nr = row.pop("company_number", None)
         if company_nr is None:
             context.log.warning("No company number: %r" % row)
@@ -163,7 +167,11 @@ def parse_psc_data(context: Zavod):
         if schema == "":
             continue
         if schema is None:
-            context.log.warn("Unknown kind of PSC", kind=kind)
+            context.log.warn(
+                "Unknown kind of PSC",
+                kind=kind,
+                name=data.get("name"),
+            )
             continue
         psc = context.make(schema)
         psc.id = context.make_slug("psc", company_nr, psc_id)
@@ -187,22 +195,23 @@ def parse_psc_data(context: Zavod):
         if dob_year and dob_month:
             psc.add("birthDate", f"{dob_year}-{dob_month:02d}")
 
-        address = data.pop("address", {})
-        addr = make_address(
-            context,
-            remarks=address.pop("premises", None),
-            street=address.pop("address_line_1", None),
-            street2=address.pop("address_line_2", None),
-            street3=address.pop("care_of", None),
-            po_box=address.pop("po_box", None),
-            postal_code=address.pop("postal_code", None),
-            region=address.pop("region", None),
-            city=address.pop("locality", None),
-            country=address.pop("country", None),
-        )
-        if addr.id is not None:
-            psc.add("addressEntity", addr.id)
-            context.emit(addr)
+        for addr_field in ("address", "principal_office_address"):
+            address = data.pop(addr_field, {})
+            addr = make_address(
+                context,
+                remarks=address.pop("premises", None),
+                street=address.pop("address_line_1", None),
+                street2=address.pop("address_line_2", None),
+                street3=address.pop("care_of", None),
+                po_box=address.pop("po_box", None),
+                postal_code=address.pop("postal_code", None),
+                region=address.pop("region", None),
+                city=address.pop("locality", None),
+                country=address.pop("country", None),
+            )
+            if addr.id is not None:
+                psc.add("addressEntity", addr.id)
+                context.emit(addr)
 
         ident = data.pop("identification", {})
         reg_nr = ident.pop("registration_number", None)
@@ -221,24 +230,27 @@ def parse_psc_data(context: Zavod):
         link.add("modifiedAt", data.pop("notified_on"))
         link.add("endDate", data.pop("ceased_on", None))
 
-        for nature in data.pop("natures_of_control"):
+        for nature in data.pop("natures_of_control", []):
             nature = nature.replace("-", " ").capitalize()
             link.add("role", nature)
 
-        if len(data):
-            pprint(data)
-        # pprint(link.to_dict())
+        if data.pop("is_sanctioned", False):
+            psc.add("topics", "sanction")
+
+        audit_data(data)
         context.emit(psc)
         context.emit(link)
 
 
 def parse_all(context):
-    with ThreadPoolExecutor(max_workers=3) as pool:
-        base_fut = pool.submit(parse_base_data, context)
-        psc_fut = pool.submit(parse_psc_data, context)
-        wait((base_fut, psc_fut))
-        base_fut.result()
-        psc_fut.result()
+    parse_base_data(context)
+    parse_psc_data(context)
+    # with ThreadPoolExecutor(max_workers=3) as pool:
+    #     base_fut = pool.submit(parse_base_data, context)
+    #     psc_fut = pool.submit(parse_psc_data, context)
+    #     wait((base_fut, psc_fut))
+    #     base_fut.result()
+    #     psc_fut.result()
 
 
 if __name__ == "__main__":
