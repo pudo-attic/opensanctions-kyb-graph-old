@@ -292,11 +292,11 @@ def parse_rr_file(context: Zavod, fh: BinaryIO):
 
 
 def parse(context: Zavod):
+    lei_file = fetch_lei_file(context)
     rr_file = fetch_rr_file(context)
     with read_zip_file(context, rr_file) as fh:
         parse_rr_file(context, fh)
 
-    lei_file = fetch_lei_file(context)
     with read_zip_file(context, lei_file) as fh:
         parse_lei_file(context, fh)
 
