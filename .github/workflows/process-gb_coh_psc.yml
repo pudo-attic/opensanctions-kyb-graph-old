@@ -2,7 +2,7 @@ name: process-gb_coh_psc
 
 on:
   schedule:
-    - cron: "0 10 * * 1"
+    - cron: "0 10 * * 0"
   workflow_dispatch: {}
 
 jobs:
