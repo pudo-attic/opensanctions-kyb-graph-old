@@ -13,15 +13,20 @@ jobs:
       run:
         working-directory: /graph/datasets/dk_cvr
     steps:
-      - name: Parse and write the DK CVR data
+      - name: test call
         run: |
-          make process
+          mkdir -p data/export
+          touch data/export/test-file.md
+      # - name: Parse and write the DK CVR data
+      #   run: |
+      #     make process
       # - name: Publish data to data.opensanctions.org
       #   env:
       #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       #   run: |
       #     make publish
-      - uses: ./workflows/actions/publish-export
+      - name: Publish data to data.opensanctions.org
+        uses: ../actions/publish-export
         with:
           dataset: "dk_cvr"
