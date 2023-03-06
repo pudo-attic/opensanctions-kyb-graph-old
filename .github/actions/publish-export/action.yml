@@ -1,5 +1,5 @@
 name: "Publish data to data.opensanctions.org"
-description: "Publish data to data.opensanctions.org"
+description: "Publish data to the upload bucket"
 inputs:
   dataset:
     description: "Dataset directory name"
@@ -7,10 +7,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Publish data to data.opensanctions.org
-      env:
+    - env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      shell: bash
       run: |
         aws s3 sync --no-progress --content-disposition attachment --metadata-directive REPLACE --acl public-read data/export s3://data.opensanctions.org/graph/${{ inputs.dataset }}
         aws cloudfront create-invalidation --distribution-id ETROMAQBEJS91 --paths "/graph/${{ inputs.dataset }}/*"
