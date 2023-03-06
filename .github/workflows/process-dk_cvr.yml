@@ -22,6 +22,6 @@ jobs:
       #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       #   run: |
       #     make publish
-      - uses: graph/publish-export
+      - uses: ./workflows/actions/publish-export
         with:
           dataset: "dk_cvr"
