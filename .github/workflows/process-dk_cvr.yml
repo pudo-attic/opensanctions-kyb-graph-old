@@ -15,8 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3.3.0
       - name: test call
-        run:
-          working-directory: /graph/datasets/dk_cvr
+        working-directory: /graph/datasets/dk_cvr
         run: |
           mkdir -p data/export
           touch data/export/test-file.md
