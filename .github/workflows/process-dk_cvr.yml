@@ -29,6 +29,6 @@ jobs:
       #   run: |
       #     make publish
       - name: Publish data to data.opensanctions.org
-        uses: ../workflows/actions/publish-export
+        uses: /graph/workflows/actions/publish-export
         with:
           dataset: "dk_cvr"
