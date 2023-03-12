@@ -28,7 +28,7 @@ jobs:
           credentials_json: "${{ secrets.GOOGLE_UPLOAD_CREDENTIAL }}"
       - uses: "google-github-actions/upload-cloud-storage@v1"
         with:
-          path: data/export
+          path: /graph/datasets/dk_cvr/data/export
           destination: gs://data.opensanctions.org/graph/dk_cvr
       - name: List bucket
         run: |
