@@ -28,7 +28,7 @@ jobs:
       #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       #   run: |
       #     make publish
-      - name: Publish data to data.opensanctions.org
-        uses: ../actions/publish-export
-        with:
-          dataset: "dk_cvr"
+      # - name: Publish data to data.opensanctions.org
+      #   uses: ../actions/publish-export
+      #   with:
+      #     dataset: "dk_cvr"
