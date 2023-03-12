@@ -9,19 +9,26 @@ jobs:
   data:
     runs-on: ubuntu-latest
     container: ghcr.io/opensanctions/graph-etl:main
-    # defaults:
-    #   run:
-    #     working-directory: /graph/datasets/dk_cvr
+    defaults:
+      run:
+        working-directory: /graph/datasets/dk_cvr
     steps:
       - uses: actions/checkout@v3.3.0
       - name: test call
-        working-directory: /graph/datasets/dk_cvr
+        # working-directory: /graph/datasets/dk_cvr
         run: |
           mkdir -p data/export
           touch data/export/test-file.md
       # - name: Parse and write the DK CVR data
       #   run: |
       #     make process
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GOOGLE_UPLOAD_CREDENTIAL }}"
+      - name: List bucket
+        run: |
+          gsutil cp -r data/export gs://data.opensanctions.org/graph/dk_cvr
       # - name: Publish data to data.opensanctions.org
       #   env:
       #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
