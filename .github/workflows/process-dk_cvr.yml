@@ -9,40 +9,19 @@ jobs:
   data:
     runs-on: ubuntu-latest
     container: ghcr.io/opensanctions/graph-etl:main
-    defaults:
-      run:
-        working-directory: /graph/datasets/dk_cvr
     steps:
       - uses: actions/checkout@v3.3.0
-      - name: test call
-        # working-directory: /graph/datasets/dk_cvr
+      - name: Parse and write the DK CVR data
+        working-directory: /graph/datasets/dk_cvr
         run: |
-          mkdir -p data/export
-          touch data/export/test-file.md
-      # - name: Parse and write the DK CVR data
-      #   working-directory: /graph/datasets/dk_cvr
-      #   run: |
-      #     make process
+          make process
       - name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1"
         with:
           credentials_json: "${{ secrets.GOOGLE_UPLOAD_CREDENTIAL }}"
-      - uses: "google-github-actions/upload-cloud-storage@v1"
+      - name: "Upload exported data to data.opensanctions.org"
+        uses: "google-github-actions/upload-cloud-storage@v1"
         with:
           path: /graph/datasets/dk_cvr/data/export/
           destination: data.opensanctions.org/graph/dk_cvr
           parent: false
-      # - name: List bucket
-      #   run: |
-      #     export
-      #     gsutil cp -r data/export gs://data.opensanctions.org/graph/dk_cvr
-      # - name: Publish data to data.opensanctions.org
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #   run: |
-      #     make publish
-      # - name: Publish data to data.opensanctions.org
-      #   uses: ../actions/publish-export
-      #   with:
-      #     dataset: "dk_cvr"
