@@ -20,6 +20,7 @@ jobs:
           mkdir -p data/export
           touch data/export/test-file.md
       # - name: Parse and write the DK CVR data
+      #   working-directory: /graph/datasets/dk_cvr
       #   run: |
       #     make process
       - name: "Authenticate to Google Cloud"
@@ -30,10 +31,11 @@ jobs:
         with:
           path: /graph/datasets/dk_cvr/data/export/
           destination: data.opensanctions.org/graph/dk_cvr
-      - name: List bucket
-        run: |
-          export
-          gsutil cp -r data/export gs://data.opensanctions.org/graph/dk_cvr
+          parent: false
+      # - name: List bucket
+      #   run: |
+      #     export
+      #     gsutil cp -r data/export gs://data.opensanctions.org/graph/dk_cvr
       # - name: Publish data to data.opensanctions.org
       #   env:
       #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
