@@ -29,7 +29,7 @@ jobs:
       - uses: "google-github-actions/upload-cloud-storage@v1"
         with:
           path: /graph/datasets/dk_cvr/data/export
-          destination: gs://data.opensanctions.org/graph/dk_cvr
+          destination: data.opensanctions.org/graph/dk_cvr
       - name: List bucket
         run: |
           export
