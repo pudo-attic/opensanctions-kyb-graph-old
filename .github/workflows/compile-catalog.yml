@@ -29,4 +29,4 @@ jobs:
         uses: "google-github-actions/upload-cloud-storage@v1"
         with:
           path: /graph/catalog.json
-          destination: data.opensanctions.org/graph/catalog.json
+          destination: data.opensanctions.org/graph/
