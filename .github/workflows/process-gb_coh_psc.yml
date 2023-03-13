@@ -12,9 +12,6 @@ jobs:
       image: ghcr.io/opensanctions/graph-etl:main
       volumes:
         - /:/host
-    defaults:
-      run:
-        working-directory: /graph/datasets/gb_coh_psc
     steps:
       - name: Maximize build space
         run: |
@@ -25,11 +22,16 @@ jobs:
           rm -rf "/host/opt/hostedtoolcache"
           ls /host/opt
       - name: Parse and write the GB CoH PSC data
+        working-directory: /graph/datasets/gb_coh_psc
         run: |
           make process
-      - name: Publish data to data.opensanctions.org
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          make publish
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GOOGLE_UPLOAD_CREDENTIAL }}"
+      - name: "Upload exported data to data.opensanctions.org"
+        uses: "google-github-actions/upload-cloud-storage@v1"
+        with:
+          path: /graph/datasets/gb_coh_psc/data/export/
+          destination: data.opensanctions.org/graph/gb_coh_psc
+          parent: false
