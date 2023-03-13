@@ -12,9 +12,6 @@ jobs:
       image: ghcr.io/opensanctions/graph-etl:main
       volumes:
         - /:/host
-    defaults:
-      run:
-        working-directory: /graph/datasets/ru_egrul
     steps:
       - name: Maximize build space
         run: |
@@ -40,11 +37,16 @@ jobs:
         # echo "Contents of /usr/local:"
         # du -hs /host/usr/local/*
       - name: Parse and write the EGRUL data
+        working-directory: /graph/datasets/ru_egrul
         run: |
           make process
-      - name: Publish data to data.opensanctions.org
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          make publish
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GOOGLE_UPLOAD_CREDENTIAL }}"
+      - name: "Upload exported data to data.opensanctions.org"
+        uses: "google-github-actions/upload-cloud-storage@v1"
+        with:
+          path: /graph/datasets/ru_egrul/data/export/
+          destination: data.opensanctions.org/graph/ru_egrul
+          parent: false
