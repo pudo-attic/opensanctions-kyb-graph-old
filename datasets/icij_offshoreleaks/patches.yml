@@ -1,27 +1,29 @@
 relationships:
   lowercase: true
   options:
-    - match:
-        - registered address
-      contains:
-        - registered office
-        - business address
-        - residential address
-        - alternative register address
-        - mailing address
-        - correspondent addr
-        - correspondance address
-        - administration address
-        - principal office
-        - administration address
-        - correspondance address
-        - business registered address
-        - residential registered address
-        - mailing registered address
-        - former registered address
-        - registered at
-        - corporate address registered at
-      prop: addressEntity
+    # - match:
+    #     - registered address
+    #     - registered office
+    #     - correspondent addr. of
+    #     - correspondance address
+    #     - same address as
+    #   contains:
+    #     - business address
+    #     - residential address
+    #     - alternative register address
+    #     - mailing address
+    #     - correspondent addr
+    #     - administration address
+    #     - principal office
+    #     - administration address
+    #     - correspondance address
+    #     - business registered address
+    #     - residential registered address
+    #     - mailing registered address
+    #     - former registered address
+    #     - registered at
+    #     - corporate address registered at
+    #   address: true
     - contains:
         - board-member
         - chairman of
@@ -367,9 +369,23 @@ relationships:
         - intermediary / eligible introducer of
         - registered agent of
         - registrar and transfer agent of
+        - registered office service provider
+        - correspondent addr. of
         - registered agent
+        - registered office
+        - registered at
+        - corporate address registered at
       contains:
         - judicial representative of
+        - registered office
+        - business address
+        - registered address
+        - residential address
+        - mailing address
+        - administration address
+        - principal office
+        - register address
+        - correspondance address
       schema: Representation
       start: agent
       end: client

@@ -104,6 +104,8 @@ def dump_nodes(context: Zavod):
     context.log.info("Dumping %d nodes to: %s", len(ENTITIES), context.sink)
     for idx, entity in enumerate(ENTITIES.values()):
         assert not entity.schema.abstract, entity
+        if entity.schema.name == "Address":
+            continue
         context.emit(entity)
         if idx > 0 and idx % 10000 == 0:
             context.log.info("Dumped %d nodes..." % idx)
@@ -221,7 +223,9 @@ def make_row_relationship(context: Zavod, row):
     _start = row.pop("node_id_start")
     _end = row.pop("node_id_end")
     start = make_entity_id(_start)
+    start_ent = ENTITIES.get(start)
     end = make_entity_id(_end)
+    end_ent = ENTITIES.get(end)
     link = row.pop("link", None)
     source_id = row.pop("sourceID", None)
     start_date = parse_date(row.pop("start_date"))
@@ -233,20 +237,35 @@ def make_row_relationship(context: Zavod, row):
         context.log.exception("Unknown link: %s" % link)
         return
 
+    if start_ent is None or end_ent is None:
+        return
+
     if res is None:
         if link not in LINK_SEEN:
             # log.warning("Unknown link type: %s (%s, %s)", link, _type, row)
             LINK_SEEN.add(link)
         return
 
-    if res.prop is not None:
-        entity = ENTITIES.get(start)
-        if entity is not None:
-            entity.add(res.prop, end)
-            entity.add("publisher", source_id)
-            # emit_entity(entity)
-            # print(entity, res.prop, ENTITIES.get(start), ENTITIES.get(end))
+    if start_ent.schema.name == "Address":
         return
+
+    if end_ent.schema.name == "Address" and start_ent.schema.is_a("Thing"):
+        start_ent.add("address", end_ent.get("full"))
+        start_ent.add("country", end_ent.get("country"))
+        return
+
+    if res.address:
+        context.log.warn(
+            "Address is not an address",
+            start=start_ent,
+            end=end_ent,
+            link=link,
+            type=_type,
+        )
+        return
+
+    if end_ent is not None and end_ent.schema.name == "Address":
+        context.log.warn("End is addr", link=link, end=end_ent)
 
     if res.schema is not None:
         rel = context.make(res.schema)
