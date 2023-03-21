@@ -1,8 +1,11 @@
 import csv
+from typing import Dict
 from datetime import datetime
 from io import TextIOWrapper
 from zipfile import ZipFile
+from normality import collapse_spaces
 from zavod import Zavod, init_context
+from zavod.audit import audit_data
 
 from followthemoney.util import join_text
 
@@ -22,12 +25,6 @@ def company_id(org_type, reg_nr):
     return f"oc-companies-cy-{org_type_oc}{reg_nr}".lower()
 
 
-def address_id(seq_nr):
-    seq_nr = seq_nr.strip()
-    if len(seq_nr):
-        return f"cy-address-seq-{seq_nr}"
-
-
 def iter_rows(zip: ZipFile, name: str):
     with zip.open(name, "r") as fh:
         wrapper = TextIOWrapper(fh, encoding="utf-8-sig")
@@ -35,7 +32,7 @@ def iter_rows(zip: ZipFile, name: str):
             yield row
 
 
-def parse_organisations(context: Zavod, rows):
+def parse_organisations(context: Zavod, rows, addresses: Dict[str, str]):
     for row in rows:
         org_type = row.pop("ORGANISATION_TYPE_CODE")
         reg_nr = row.pop("REGISTRATION_NO")
@@ -65,10 +62,11 @@ def parse_organisations(context: Zavod, rows):
         status_date = parse_date(row.pop("ORGANISATION_STATUS_DATE"))
         entity.add("modifiedAt", status_date)
 
-        addr_id = address_id(row.pop("ADDRESS_SEQ_NO"))
-        entity.add("addressEntity", addr_id)
+        addr_id = row.pop("ADDRESS_SEQ_NO")
+        entity.add("address", addresses.get(addr_id))
         context.emit(entity)
         # print(entity.to_dict())
+        audit_data(row, ignore=["NAME_STATUS_CODE", "NAME_STATUS"])
 
 
 def parse_officials(context: Zavod, rows):
@@ -93,38 +91,39 @@ def parse_officials(context: Zavod, rows):
         context.emit(link)
 
 
-def parse_address(context: Zavod, rows):
-    # org_types = list(TYPES.keys())
+def load_addresses(rows) -> Dict[str, str]:
+    addresses: Dict[str, str] = {}
     for row in rows:
-        entity = context.make("Address")
-        entity.id = address_id(row.pop("ADDRESS_SEQ_NO"))
-        if entity.id is None:
+        seq_no = row.pop("ADDRESS_SEQ_NO")
+        if seq_no is None:
             continue
-        entity.add("country", "cy")
         street = row.pop("STREET")
-        entity.add("street", street)
         building = row.pop("BUILDING")
-        entity.add("remarks", building)
         territory = row.pop("TERRITORY")
-        entity.add("full", join_text(building, street, territory, sep=", "))
-        context.emit(entity)
-        # print(row)
+        address = join_text(building, street, territory, sep=", ")
+        if address is not None:
+            address = collapse_spaces(address.replace("_", ""))
+            if address is not None:
+                addresses[seq_no] = address
+    return addresses
 
 
 def parse(context: Zavod):
     data_path = context.fetch_resource("data.zip", URL)
     with ZipFile(data_path, "r") as zip:
+        addresses: Dict[str, str] = {}
+        for name in zip.namelist():
+            if name.startswith("registered_office_"):
+                addresses = load_addresses(iter_rows(zip, name))
+
         for name in zip.namelist():
             context.log.info("Reading: %s in %s" % (name, data_path))
             if name.startswith("organisations_"):
                 rows = iter_rows(zip, name)
-                parse_organisations(context, rows)
+                parse_organisations(context, rows, addresses)
             if name.startswith("organisation_officials_"):
                 rows = iter_rows(zip, name)
                 parse_officials(context, rows)
-            if name.startswith("registered_office_"):
-                rows = iter_rows(zip, name)
-                parse_address(context, rows)
 
 
 if __name__ == "__main__":
