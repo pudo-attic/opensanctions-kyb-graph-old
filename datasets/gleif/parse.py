@@ -6,13 +6,13 @@ from typing import BinaryIO, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin
 from zipfile import ZipFile
 
-import requests
 from lxml import etree, html
 from normality import slugify
 from zavod import Zavod, init_context
 from zavod.parse import remove_namespace
 from zavod.parse.addresses import format_line
 
+UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
 LEI = "http://www.gleif.org/data/schema/leidata/2016"
 RR = "http://www.gleif.org/data/schema/rr/2016"
 
@@ -71,22 +71,22 @@ def parse_date(text: Optional[str]) -> Optional[str]:
 
 
 def fetch_bic_mapping(context: Zavod) -> Path:
-    res = requests.get(BIC_URL)
+    res = context.http.get(BIC_URL)
     doc = html.fromstring(res.text)
-    csv_url = None
+    zip_url = None
     for link in doc.findall(".//a"):
-        if "download" in link.attrib:
+        if "href" in link.attrib:
             url = urljoin(BIC_URL, link.get("href"))
-            if url.endswith(".csv"):
-                csv_url = url
+            if "api/v2/bic-lei/" in url:
+                zip_url = url
                 break
-    if csv_url is None:
-        raise RuntimeError("No BIC/LEI mapping file found!")
-    return context.fetch_resource("bic_lei.csv", csv_url)
+    if zip_url is None:
+        raise RuntimeError("No BIC/LEI mapping file found: %s" % BIC_URL)
+    return context.fetch_resource("bic_lei.zip", zip_url)
 
 
 def fetch_isin_mapping(context: Zavod) -> Path:
-    res = requests.get(ISIN_URL)
+    res = context.http.get(ISIN_URL)
     doc = html.fromstring(res.text)
     mapping_url = None
     for link in doc.findall(".//a"):
@@ -100,12 +100,13 @@ def fetch_isin_mapping(context: Zavod) -> Path:
 
 
 def fetch_cat_file(context: Zavod, url_part: str, name: str) -> Optional[Path]:
-    res = requests.get(CAT_URL)
+    res = context.http.get(CAT_URL)
     doc = html.fromstring(res.text)
     for link in doc.findall(".//a"):
-        url = urljoin(BIC_URL, link.get("href"))
+        url = urljoin(CAT_URL, link.get("href"))
         if url_part in url:
             return context.fetch_resource(name, url)
+    context.log.info("Failed HTML", url=CAT_URL, html=res.text)
     return None
 
 
@@ -133,10 +134,11 @@ def read_zip_file(context: Zavod, path: Path):
 
 
 def load_bic_mapping(context: Zavod) -> Dict[str, List[str]]:
-    csv_path = fetch_bic_mapping(context)
+    zip_path = fetch_bic_mapping(context)
     mapping: Dict[str, List[str]] = {}
-    with open(csv_path, "r") as fh:
-        for row in csv.DictReader(fh):
+    with read_zip_file(context, zip_path) as fh:
+        textfh = TextIOWrapper(fh, encoding="utf-8")
+        for row in csv.DictReader(textfh):
             lei = row.get("LEI")
             if lei is None:
                 raise RuntimeError("No LEI in BIC/LEI mapping")
@@ -294,14 +296,14 @@ def parse_rr_file(context: Zavod, fh: BinaryIO):
 def parse(context: Zavod):
     lei_file = fetch_lei_file(context)
     rr_file = fetch_rr_file(context)
-    with read_zip_file(context, rr_file) as fh:
-        parse_rr_file(context, fh)
-
     with read_zip_file(context, lei_file) as fh:
         parse_lei_file(context, fh)
+    with read_zip_file(context, rr_file) as fh:
+        parse_rr_file(context, fh)
 
 
 if __name__ == "__main__":
     with init_context("metadata.yml") as context:
+        context.http.headers["User-Agent"] = UA
         context.export_metadata("export/index.json")
         parse(context)
