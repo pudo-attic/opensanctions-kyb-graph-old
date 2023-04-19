@@ -17,7 +17,7 @@ LEI = "http://www.gleif.org/data/schema/leidata/2016"
 RR = "http://www.gleif.org/data/schema/rr/2016"
 
 CAT_URL = "https://www.gleif.org/en/lei-data/gleif-concatenated-file/download-the-concatenated-file"
-BIC_URL = "https://www.gleif.org/en/lei-data/lei-mapping/download-bic-to-lei-relationship-files"
+BIC_URL = "https://mapping.gleif.org/api/v2/bic-lei/latest/download"
 ISIN_URL = "https://www.gleif.org/en/lei-data/lei-mapping/download-isin-to-lei-relationship-files"
 
 RELATIONSHIPS: Dict[str, Tuple[str, str, str]] = {
@@ -71,18 +71,18 @@ def parse_date(text: Optional[str]) -> Optional[str]:
 
 
 def fetch_bic_mapping(context: Zavod) -> Path:
-    res = context.http.get(BIC_URL)
-    doc = html.fromstring(res.text)
-    zip_url = None
-    for link in doc.findall(".//a"):
-        if "href" in link.attrib:
-            url = urljoin(BIC_URL, link.get("href"))
-            if "api/v2/bic-lei/" in url:
-                zip_url = url
-                break
-    if zip_url is None:
-        raise RuntimeError("No BIC/LEI mapping file found: %s" % BIC_URL)
-    return context.fetch_resource("bic_lei.zip", zip_url)
+    # res = context.http.get(BIC_URL)
+    # doc = html.fromstring(res.text)
+    # zip_url = None
+    # for link in doc.findall(".//a"):
+    #     if "href" in link.attrib:
+    #         url = urljoin(BIC_URL, link.get("href"))
+    #         if "api/v2/bic-lei/" in url:
+    #             zip_url = url
+    #             break
+    # if zip_url is None:
+    #     raise RuntimeError("No BIC/LEI mapping file found: %s" % BIC_URL)
+    return context.fetch_resource("bic_lei.zip", BIC_URL)
 
 
 def fetch_isin_mapping(context: Zavod) -> Path:
