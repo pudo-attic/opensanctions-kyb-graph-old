@@ -218,6 +218,7 @@ def parse_psc_data(context: Zavod, data_path: PathLike):
         link = context.make("Ownership")
         link.id = context.make_slug("stmt", company_nr, psc_id)
         link.add("owner", psc.id)
+        link.add("recordId", psc_id)
         link.add("asset", company_id(context, company_nr))
         link.add("startDate", data.pop("notified_on"))
         link.add("endDate", data.pop("ceased_on", None))
