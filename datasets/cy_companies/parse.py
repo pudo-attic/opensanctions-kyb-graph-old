@@ -90,11 +90,11 @@ def parse_officials(context: Zavod, rows):
 
         link = context.make("Directorship")
         link.id = context.make_id("Directorship", org_type, reg_nr, name, position)
-        company_id = company_id(org_type, reg_nr)
-        if company_id is None:
+        org_id = company_id(org_type, reg_nr)
+        if org_id is None:
             context.log.error("Could not make ID", org_type=org_type, reg_nr=reg_nr)
             continue
-        link.add("organization", company_id)
+        link.add("organization", org_id)
         link.add("director", entity.id)
         link.add("role", position)
         context.emit(link)
