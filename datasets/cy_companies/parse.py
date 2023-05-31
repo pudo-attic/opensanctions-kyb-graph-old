@@ -1,5 +1,5 @@
 import csv
-from typing import Dict
+from typing import Dict, Optional
 from datetime import datetime
 from io import TextIOWrapper
 from zipfile import ZipFile
@@ -14,14 +14,16 @@ URL = "https://www.data.gov.cy/node/4016/dataset/download"
 TYPES = {"C": "HE", "P": "S", "O": "AE", "N": "BN", "B": "B"}
 
 
-def parse_date(text):
+def parse_date(text: Optional[str]) -> Optional[str]:
     if text is None or not len(text.strip()):
         return None
     return datetime.strptime(text, "%d/%m/%Y").date()
 
 
-def company_id(org_type, reg_nr):
-    org_type_oc = TYPES[org_type]
+def company_id(org_type: str, reg_nr: str) -> Optional[str]:
+    org_type_oc = TYPES.get(org_type)
+    if org_type_oc is None:
+        return None
     return f"oc-companies-cy-{org_type_oc}{reg_nr}".lower()
 
 
@@ -40,6 +42,9 @@ def parse_organisations(context: Zavod, rows, addresses: Dict[str, str]):
             continue
         entity = context.make("Company")
         entity.id = company_id(org_type, reg_nr)
+        if entity.id is None:
+            context.log.error("Could not make ID", org_type=org_type, reg_nr=reg_nr)
+            continue
         entity.add("name", row.pop("ORGANISATION_NAME"))
         entity.add("status", row.pop("ORGANISATION_STATUS"))
         if org_type == "O":
@@ -85,7 +90,11 @@ def parse_officials(context: Zavod, rows):
 
         link = context.make("Directorship")
         link.id = context.make_id("Directorship", org_type, reg_nr, name, position)
-        link.add("organization", company_id(org_type, reg_nr))
+        company_id = company_id(org_type, reg_nr)
+        if company_id is None:
+            context.log.error("Could not make ID", org_type=org_type, reg_nr=reg_nr)
+            continue
+        link.add("organization", company_id)
         link.add("director", entity.id)
         link.add("role", position)
         context.emit(link)

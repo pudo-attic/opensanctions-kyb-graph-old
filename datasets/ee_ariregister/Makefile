@@ -9,11 +9,11 @@ all: clean process publish
 download: $(sources)
 
 $(sources): data/%.json: data/%.zip
-	unzip -j data/$*.zip $*.json -d data
+	unzip -q -o -j data/$*.zip $*.json -d data
 
 data/%.zip:
 	mkdir -p data
-	curl -o data/$*.zip https://avaandmed.ariregister.rik.ee/sites/default/files/avaandmed/$*.json.zip
+	curl -s -o data/$*.zip https://avaandmed.ariregister.rik.ee/sites/default/files/avaandmed/$*.json.zip
 
 data/fragments.json: download
 	python parse.py
