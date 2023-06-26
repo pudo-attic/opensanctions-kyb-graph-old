@@ -66,7 +66,12 @@ def read_base_data_csv(path: PathLike):
                     yield {k.strip(): v for (k, v) in row.items()}
 
 
-def parse_base_data(context: Zavod, data_path: PathLike):
+def parse_base_data(context: Zavod):
+    base_data_url = get_base_data_url(context)
+    if base_data_url is None:
+        raise RuntimeError("Base data zip URL not found!")
+    data_path = context.fetch_resource("base_data.zip", base_data_url)
+
     context.log.info("Loading: %s" % data_path)
     for idx, row in enumerate(read_base_data_csv(data_path)):
         if idx > 0 and idx % 10000 == 0:
@@ -139,7 +144,11 @@ def read_psc_data(path: PathLike):
                     yield json.loads(line)
 
 
-def parse_psc_data(context: Zavod, data_path: PathLike):
+def parse_psc_data(context: Zavod):
+    psc_data_url = get_psc_data_url(context)
+    if psc_data_url is None:
+        raise RuntimeError("PSC data zip URL not found!")
+    data_path = context.fetch_resource("psc_data.zip", psc_data_url)
     context.log.info("Loading: %s" % data_path)
     for idx, row in enumerate(read_psc_data(data_path)):
         if idx > 0 and idx % 10000 == 0:
@@ -236,23 +245,14 @@ def parse_psc_data(context: Zavod, data_path: PathLike):
 
 
 def parse_all(context: Zavod):
-    base_data_url = get_base_data_url(context)
-    if base_data_url is None:
-        raise RuntimeError("Base data zip URL not found!")
-    base_data_path = context.fetch_resource("base_data.zip", base_data_url)
-
-    psc_data_url = get_psc_data_url(context)
-    if psc_data_url is None:
-        raise RuntimeError("PSC data zip URL not found!")
-    psc_data_path = context.fetch_resource("psc_data.zip", psc_data_url)
-    parse_base_data(context, base_data_path)
-    parse_psc_data(context, psc_data_path)
-    # with ThreadPoolExecutor(max_workers=3) as pool:
-    #     base_fut = pool.submit(parse_base_data, context)
-    #     psc_fut = pool.submit(parse_psc_data, context)
-    #     wait((base_fut, psc_fut))
-    #     base_fut.result()
-    #     psc_fut.result()
+    # parse_base_data(context, base_data_path)
+    # parse_psc_data(context, psc_data_path)
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        base_fut = pool.submit(parse_base_data, context)
+        psc_fut = pool.submit(parse_psc_data, context)
+        wait((base_fut, psc_fut))
+        base_fut.result()
+        psc_fut.result()
 
 
 if __name__ == "__main__":
