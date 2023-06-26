@@ -4,6 +4,7 @@ data/fragments.json: parse.py
 	python parse.py
 
 data/combined.json: data/fragments.json
+	rm -f data/*.zip
 	sort -o data/combined.json data/fragments.json
 
 data/export/entities.ftm.json: data/combined.json

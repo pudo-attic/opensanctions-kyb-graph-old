@@ -20,7 +20,13 @@ jobs:
           rm -rf "/host/usr/local/share/boost"
           rm -rf "/host/usr/local/lib/android"
           rm -rf "/host/opt/hostedtoolcache"
+          rm -rf "/host/opt/google"
+          rm -rf "/host/opt/mssql-tools"
+          rm -rf "/host/opt/vsts"
+          rm -rf "/host/opt/az"
           ls /host/opt
+          echo "Overall usage:"
+          df -h
       - name: Parse and write the GB CoH PSC data
         working-directory: /graph/datasets/gb_coh_psc
         run: |
