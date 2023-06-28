@@ -7,7 +7,7 @@ from followthemoney.util import make_entity_id
 from lxml import etree
 from nomenklatura.entity import CE
 from zavod import Zavod, init_context
-from zavod.parse.addresses import format_line
+from zavod.parse import format_address
 from zavod.parse.xml import ElementOrTree, remove_namespace
 
 URL = "http://wwwinfo.mfcr.cz/ares/ares_vreo_all.tar.gz"
@@ -52,7 +52,7 @@ def make_address(tree: Optional[ElementOrTree] = None) -> Optional[str]:
         summary_parts.append(district)
     data["summary"] = ", ".join(summary_parts).strip(", ")
     data["country_code"] = "cz"
-    return format_line(**data)
+    return format_address(**data)
 
 
 def make_company(context: Zavod, tree: ElementOrTree) -> CE:

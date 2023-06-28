@@ -1,16 +1,18 @@
 import csv
 import json
+from typing import Optional
 from lxml import html
-from pprint import pprint
 from zipfile import ZipFile
-from functools import cache
+from functools import cache, lru_cache
 from io import TextIOWrapper
 from datetime import datetime
 from urllib.parse import urljoin
 from concurrent.futures import ThreadPoolExecutor, wait
+from followthemoney.types import registry
+from followthemoney.util import join_text
 
 from zavod import PathLike, init_context, Zavod
-from zavod.parse import make_address
+from zavod.parse import format_address
 from zavod.audit import audit_data
 
 BASE_URL = "http://download.companieshouse.gov.uk/en_output.html"
@@ -35,6 +37,14 @@ def company_id(context: Zavod, company_nr):
 
 
 @cache
+def parse_country(name: str, default: Optional[str] = None) -> Optional[str]:
+    code = registry.country.clean(name)
+    if code is None:
+        return default
+    return code
+
+
+@lru_cache(maxsize=10000)
 def parse_date(text):
     if text is None or not len(text):
         return None
@@ -76,6 +86,8 @@ def parse_base_data(context: Zavod):
     for idx, row in enumerate(read_base_data_csv(data_path)):
         if idx > 0 and idx % 10000 == 0:
             context.log.info("Companies: %d..." % idx)
+        # if idx > 0 and idx % 1000000 == 0:
+        #     return
         company_nr = row.pop("CompanyNumber")
         entity = context.make("Company")
         entity.id = company_id(context, company_nr)
@@ -102,25 +114,21 @@ def parse_base_data(context: Zavod):
             row.pop(f"PreviousName_{i}.CONDATE")
             entity.add("previousName", row.pop(f"PreviousName_{i}.CompanyName"))
 
-        country = row.pop("RegAddress.Country")
-        country_code = None
-        if not len(country.strip()):
-            country_code = "gb"
-        addr = make_address(
-            context,
-            street=row.pop("RegAddress.AddressLine1"),
-            street2=row.pop("RegAddress.AddressLine2"),
-            street3=row.pop("RegAddress.CareOf"),
+        country_code = parse_country(row.pop("RegAddress.Country"), default="gb")
+        street = join_text(
+            row.pop("RegAddress.AddressLine1"),
+            row.pop("RegAddress.AddressLine2"),
+        )
+        addr_text = format_address(
+            summary=row.pop("RegAddress.CareOf"),
             po_box=row.pop("RegAddress.POBox"),
+            street=street,
             postal_code=row.pop("RegAddress.PostCode"),
-            region=row.pop("RegAddress.County"),
+            county=row.pop("RegAddress.County"),
             city=row.pop("RegAddress.PostTown"),
-            country=country,
             country_code=country_code,
         )
-        if addr.id is not None:
-            entity.add("addressEntity", addr.id)
-            context.emit(addr)
+        entity.add("address", addr_text)
 
         # pprint(entity.to_dict())
         context.emit(entity)
@@ -153,8 +161,8 @@ def parse_psc_data(context: Zavod):
     for idx, row in enumerate(read_psc_data(data_path)):
         if idx > 0 and idx % 10000 == 0:
             context.log.info("PSC statements: %d..." % idx)
-        # if idx < 9_600_000:
-        #     continue
+        # if idx > 0 and idx % 1000000 == 0:
+        #     return
         company_nr = row.pop("company_number", None)
         if company_nr is None:
             context.log.warning("No company number: %r" % row)
@@ -198,21 +206,20 @@ def parse_psc_data(context: Zavod):
 
         for addr_field in ("address", "principal_office_address"):
             address = data.pop(addr_field, {})
-            addr = make_address(
-                context,
-                remarks=address.pop("premises", None),
-                street=address.pop("address_line_1", None),
-                street2=address.pop("address_line_2", None),
-                street3=address.pop("care_of", None),
-                po_box=address.pop("po_box", None),
-                postal_code=address.pop("postal_code", None),
-                region=address.pop("region", None),
-                city=address.pop("locality", None),
-                country=address.pop("country", None),
+            street = join_text(
+                address.pop("address_line_1", None),
+                address.pop("address_line_2", None),
             )
-            if addr.id is not None:
-                psc.add("addressEntity", addr.id)
-                context.emit(addr)
+            addr_text = format_address(
+                summary=address.pop("care_of", None),
+                po_box=address.pop("po_box", None),
+                street=street,
+                postal_code=address.pop("postal_code", None),
+                state=address.pop("region", None),
+                city=address.pop("locality", None),
+                country_code=parse_country(address.pop("country", None)),
+            )
+            psc.add("address", addr_text)
 
         ident = data.pop("identification", {})
         reg_nr = ident.pop("registration_number", None)

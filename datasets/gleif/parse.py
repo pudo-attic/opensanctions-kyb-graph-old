@@ -10,7 +10,7 @@ from lxml import etree, html
 from normality import slugify
 from zavod import Zavod, init_context
 from zavod.parse import remove_namespace
-from zavod.parse.addresses import format_line
+from zavod.parse import format_address
 
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
 LEI = "http://www.gleif.org/data/schema/leidata/2016"
@@ -31,7 +31,7 @@ RELATIONSHIPS: Dict[str, Tuple[str, str, str]] = {
 
 
 ADDRESS_PARTS: Dict[str, str] = {
-    # map paths to zavod.parse.format_line input
+    # map paths to zavod.parse.format_address input
     "City": "city",
     "Region": "state",
     "Country": "country_code",
@@ -44,7 +44,7 @@ def make_address(el: etree._Element) -> str:
     parent = el.getparent()
     for tag, key in ADDRESS_PARTS.items():
         parts[key] = parent.findtext(tag)
-    return format_line(**parts)
+    return format_address(**parts)
 
 
 def load_elfs() -> Dict[str, str]:

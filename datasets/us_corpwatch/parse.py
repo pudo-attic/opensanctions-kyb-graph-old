@@ -5,7 +5,7 @@ from typing import Callable, Optional, Union
 
 from nomenklatura.entity import CE
 from zavod import Zavod, init_context
-from zavod.parse.addresses import format_line
+from zavod.parse import format_address
 
 
 def clean(value: Optional[str] = None) -> Optional[str]:
@@ -70,7 +70,7 @@ def parse_company_locations(context: Zavod, row: dict):
         proxy.add("country", country_code)
         street = [s for s in (row.pop("street_1"), row.pop("street_2")) if clean(s)]
         street = ", ".join(street)
-        address = format_line(
+        address = format_address(
             street=street,
             postal_code=clean(row.pop("postal_code")),
             city=clean(row.pop("city")),
