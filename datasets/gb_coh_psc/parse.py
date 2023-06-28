@@ -253,7 +253,7 @@ def parse_psc_data(context: Zavod):
 
 
 def parse_all(context: Zavod):
-    # parse_base_data(context)
+    parse_base_data(context)
     parse_psc_data(context)
     # with ThreadPoolExecutor(max_workers=3) as pool:
     #     base_fut = pool.submit(parse_base_data, context)
