@@ -183,7 +183,8 @@ def parse_psc_data(context: Zavod):
             )
             continue
         psc = context.make(schema)
-        psc.id = context.make_slug("psc", company_nr, psc_id)
+        psc_id_slug = psc_id.replace("_", "-").lower()
+        psc.id = f"{context.dataset.prefix}-psc-{company_nr}-{psc_id_slug}"
         psc.add("name", data.pop("name"))
         nationality = data.pop("nationality", None)
         if psc.schema.is_a("Person"):
@@ -252,14 +253,14 @@ def parse_psc_data(context: Zavod):
 
 
 def parse_all(context: Zavod):
-    # parse_base_data(context, base_data_path)
-    # parse_psc_data(context, psc_data_path)
-    with ThreadPoolExecutor(max_workers=3) as pool:
-        base_fut = pool.submit(parse_base_data, context)
-        psc_fut = pool.submit(parse_psc_data, context)
-        wait((base_fut, psc_fut))
-        base_fut.result()
-        psc_fut.result()
+    # parse_base_data(context)
+    parse_psc_data(context)
+    # with ThreadPoolExecutor(max_workers=3) as pool:
+    #     base_fut = pool.submit(parse_base_data, context)
+    #     psc_fut = pool.submit(parse_psc_data, context)
+    #     wait((base_fut, psc_fut))
+    #     base_fut.result()
+    #     psc_fut.result()
 
 
 if __name__ == "__main__":
