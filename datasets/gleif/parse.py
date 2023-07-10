@@ -18,7 +18,8 @@ RR = "http://www.gleif.org/data/schema/rr/2016"
 
 CAT_URL = "https://www.gleif.org/en/lei-data/gleif-concatenated-file/download-the-concatenated-file"
 BIC_URL = "https://mapping.gleif.org/api/v2/bic-lei/latest/download"
-ISIN_URL = "https://www.gleif.org/en/lei-data/lei-mapping/download-isin-to-lei-relationship-files"
+ISIN_URL = "https://mapping.gleif.org/api/v2/isin-lei/latest/download"
+OC_URL = "https://mapping.gleif.org/api/v2/oc-lei/latest/download"
 
 RELATIONSHIPS: Dict[str, Tuple[str, str, str]] = {
     "IS_FUND-MANAGED_BY": ("Directorship", "organization", "director"),
@@ -70,35 +71,6 @@ def parse_date(text: Optional[str]) -> Optional[str]:
     return text.split("T")[0]
 
 
-def fetch_bic_mapping(context: Zavod) -> Path:
-    # res = context.http.get(BIC_URL)
-    # doc = html.fromstring(res.text)
-    # zip_url = None
-    # for link in doc.findall(".//a"):
-    #     if "href" in link.attrib:
-    #         url = urljoin(BIC_URL, link.get("href"))
-    #         if "api/v2/bic-lei/" in url:
-    #             zip_url = url
-    #             break
-    # if zip_url is None:
-    #     raise RuntimeError("No BIC/LEI mapping file found: %s" % BIC_URL)
-    return context.fetch_resource("bic_lei.zip", BIC_URL)
-
-
-def fetch_isin_mapping(context: Zavod) -> Path:
-    res = context.http.get(ISIN_URL)
-    doc = html.fromstring(res.text)
-    mapping_url = None
-    for link in doc.findall(".//a"):
-        url = urljoin(BIC_URL, link.get("href"))
-        if "https://mapping.gleif.org/api/v2/isin-lei/" in url:
-            mapping_url = url
-            break
-    if mapping_url is None:
-        raise RuntimeError("No ISIN mapping file found!")
-    return context.fetch_resource("isin.zip", mapping_url)
-
-
 def fetch_cat_file(context: Zavod, url_part: str, name: str) -> Optional[Path]:
     res = context.http.get(CAT_URL)
     doc = html.fromstring(res.text)
@@ -134,7 +106,7 @@ def read_zip_file(context: Zavod, path: Path):
 
 
 def load_bic_mapping(context: Zavod) -> Dict[str, List[str]]:
-    zip_path = fetch_bic_mapping(context)
+    zip_path = context.fetch_resource("bic_lei.zip", BIC_URL)
     mapping: Dict[str, List[str]] = {}
     with read_zip_file(context, zip_path) as fh:
         textfh = TextIOWrapper(fh, encoding="utf-8")
@@ -149,8 +121,25 @@ def load_bic_mapping(context: Zavod) -> Dict[str, List[str]]:
     return mapping
 
 
+def load_oc_mapping(context: Zavod) -> Dict[str, List[str]]:
+    zip_path = context.fetch_resource("oc_lei.zip", OC_URL)
+    mapping: Dict[str, List[str]] = {}
+    with read_zip_file(context, zip_path) as fh:
+        textfh = TextIOWrapper(fh, encoding="utf-8")
+        for row in csv.DictReader(textfh):
+            lei = row.get("LEI")
+            if lei is None:
+                raise RuntimeError("No LEI in BIC/LEI mapping")
+            mapping.setdefault(lei, [])
+            oc_id = row.get("OpenCorporatesID")
+            if oc_id is not None:
+                oc_url = f"https://opencorporates.com/companies/{oc_id}"
+                mapping[lei].append(oc_url)
+    return mapping
+
+
 def load_isin_mapping(context: Zavod) -> Dict[str, List[str]]:
-    zip_path = fetch_isin_mapping(context)
+    zip_path = context.fetch_resource("isin_lei.zip", ISIN_URL)
     mapping: Dict[str, List[str]] = {}
     with read_zip_file(context, zip_path) as fh:
         textfh = TextIOWrapper(fh, encoding="utf-8")
@@ -168,6 +157,7 @@ def load_isin_mapping(context: Zavod) -> Dict[str, List[str]]:
 def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
     elfs = load_elfs()
     bics = load_bic_mapping(context)
+    ocurls = load_oc_mapping(context)
     isins = load_isin_mapping(context)
     for idx, (_, el) in enumerate(etree.iterparse(fh, tag="{%s}LEIRecord" % LEI)):
         if idx > 0 and idx % 10000 == 0:
@@ -193,6 +183,7 @@ def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
 
         proxy.add("swiftBic", bics.get(lei))
         proxy.add("leiCode", lei, quiet=True)
+        proxy.add("opencorporatesUrl", ocurls.get(lei))
 
         for isin in isins.get(lei, []):
             security = context.make("Security")
@@ -205,7 +196,8 @@ def parse_lei_file(context: Zavod, fh: BinaryIO) -> None:
         legal_form = entity.find("LegalForm")
         if legal_form is not None:
             code = legal_form.findtext("EntityLegalFormCode")
-            proxy.add("legalForm", elfs.get(code))
+            if code is not None:
+                proxy.add("legalForm", elfs.get(code))
             proxy.add("legalForm", legal_form.findtext("OtherLegalForm"))
 
         registration = elc.find("Registration")
