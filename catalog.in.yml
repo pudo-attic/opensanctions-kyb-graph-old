@@ -4,15 +4,15 @@ datasets:
   - include: https://data.opensanctions.org/graph/gb_coh_psc/index.json
   - include: https://data.opensanctions.org/graph/ru_egrul/index.json
   - include: https://data.opensanctions.org/graph/ua_edr/index.json
-  - include: https://data.opensanctions.org/graph/md_companies/index.json
+  - include: https://data.opensanctions.org/datasets/latest/md_companies/index.json
   - include: https://data.opensanctions.org/graph/cy_companies/index.json
-  - include: https://data.opensanctions.org/graph/dk_cvr/index.json
-  - include: https://data.opensanctions.org/graph/sk_rpvs/index.json
+  - include: https://data.opensanctions.org/datasets/latest/dk_cvr/index.json
+  - include: https://data.opensanctions.org/datasets/latest/sk_rpvs/index.json
   - include: https://data.opensanctions.org/graph/ee_ariregister/index.json
   - include: https://data.opensanctions.org/graph/lv_business_register/index.json
   - include: https://data.opensanctions.org/graph/cz_business_register/index.json
-  - include: https://data.opensanctions.org/graph/us_corpwatch/index.json
-  - include: https://data.opensanctions.org/graph/de_offeneregister/index.json
+  - include: https://data.opensanctions.org/datasets/latest/us_corpwatch/index.json
+  - include: https://data.opensanctions.org/datasets/latest/de_offeneregister/index.json
   - name: openownership
     title: OpenOwnership Collection
     summary: |
