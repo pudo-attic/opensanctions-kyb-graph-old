@@ -1,14 +1,14 @@
 datasets:
-  - include: https://data.opensanctions.org/graph/icij_offshoreleaks/index.json
-  - include: https://data.opensanctions.org/graph/gleif/index.json
+  - include: https://data.opensanctions.org/datasets/latest/icij_offshoreleaks/index.json
+  - include: https://data.opensanctions.org/datasets/latest/gleif/index.json
   - include: https://data.opensanctions.org/datasets/latest/gb_coh_psc/index.json
-  - include: https://data.opensanctions.org/graph/ru_egrul/index.json
+  - include: https://data.opensanctions.org/datasets/latest/ru_egrul/index.json
   - include: https://data.opensanctions.org/datasets/latest/ua_edr/index.json
   - include: https://data.opensanctions.org/datasets/latest/md_companies/index.json
   - include: https://data.opensanctions.org/datasets/latest/cy_companies/index.json
   - include: https://data.opensanctions.org/datasets/latest/dk_cvr/index.json
   - include: https://data.opensanctions.org/datasets/latest/sk_rpvs/index.json
-  - include: https://data.opensanctions.org/graph/ee_ariregister/index.json
+  - include: https://data.opensanctions.org/datasets/latest/ee_ariregister/index.json
   - include: https://data.opensanctions.org/datasets/latest/lv_business_register/index.json
   - include: https://data.opensanctions.org/datasets/latest/cz_business_register/index.json
   - include: https://data.opensanctions.org/datasets/latest/us_corpwatch/index.json
